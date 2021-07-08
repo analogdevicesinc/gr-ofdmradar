@@ -1,0 +1,32 @@
+id: ofdmradar_ofdmradar_rx
+label: OFDM Radar Receiver
+category: '[ofdmradar]'
+
+parameters:
+- id: ofdm_radar_params
+  label: OFDM Radar Params
+  dtype: raw
+- id: callback
+  label: Callback
+  dtype: raw
+- id: len_tag_key
+  label: Length Tag Key
+  dtype: string
+  default: "packet_len"
+
+inputs:
+- label: In
+  domain: stream
+  dtype: complex
+  optional: false
+
+asserts:
+  - ${( callable(callback) )}
+
+templates:
+  imports: import ofdmradar
+  make: ofdmradar.ofdmradar_rx(${ofdm_radar_params}, ${callback}, ${len_tag_key})
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1

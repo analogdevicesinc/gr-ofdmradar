@@ -1,0 +1,71 @@
+id: ofdmradar_ofdmradar_params
+label: OFDM Radar System Parameters
+flags: [python, show_id]
+category: '[ofdmradar]'
+
+parameters:
+- id: carriers
+  label: Carriers (N)
+  dtype: int
+  default: 1024
+- id: symbols
+  label: Symbols (M)
+  dtype: int
+  default: 64
+- id: cyclic_prefix_length
+  label: Cyclic Prefix Length
+  dtype: int
+  default: 128
+- id: dc_guard
+  label: DC Guard
+  dtype: int
+  default: 1
+- id: nyquist_guard
+  label: Nyquist Guard
+  dtype: int
+  default: 64
+- id: modulation_scheme
+  label: Modulation Scheme
+  dtype: enum
+  options: [BPSK, QPSK, PSK, QAM, Custom]
+  option_labels: ["BPSK", "QPSK", "PSK", "QAM", "Custom"]
+  option_attributes:
+    val: [ofdmradar.modulation_scheme.BPSK, ofdmradar.modulation_scheme.QPSK, ofdmradar.modulation_scheme.PSK, ofdmradar.modulation_scheme.QAM, None]
+    hide_order: [all, all, part, part, all]
+    hide_custom: [all, all, all, all, part]
+- id: custom_constellation
+  label: Constellation
+  dtype: raw
+  hide: ${( modulation_scheme.hide_custom )}
+  default: "[1.0, -1.0]"
+- id: constellation_order
+  label: Constellation Order
+  dtype: int
+  default: 4
+  hide: ${( modulation_scheme.hide_order )}
+- id: seed
+  label: Seed
+  dtype: int
+  default: 0
+
+# value: ${( str({"carriers": carriers, "symbols": symbols, "prefix": cyclic_prefix_length, "dc_guard": dc_guard, "nyquist_guard": nyquist_guard, "constellation": modulation_scheme, "seed": seed}) )}
+value: ${( ofdmradar.ofdmradar_params(carriers, symbols, cyclic_prefix_length, dc_guard, nyquist_guard, [-1, 1], seed) )}
+
+templates:
+  imports: import ofdmradar
+  var_make: |-
+    self.${id} = ${id} = ofdmradar.ofdmradar_params(${carriers},
+      ${symbols},
+      ${cyclic_prefix_length},
+      ${dc_guard},
+      ${nyquist_guard},
+      % if str(modulation_scheme) == "Custom":
+      ${custom_constellation}
+      % else:
+      ofdmradar.get_constellation(${modulation_scheme.val}, ${constellation_order}),
+      % endif
+      ${seed})
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1
