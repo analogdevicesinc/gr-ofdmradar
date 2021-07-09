@@ -26,11 +26,13 @@ private:
     std::vector<tag_t> d_tags;
     std::vector<gr_complex> d_frame_buffer;
     fftwf_plan d_doppler_fft_plan;
+    size_t d_buffer_size;
 
 public:
     ofdmradar_rx_impl(ofdmradar_params::sptr ofdm_params,
                       callback_t &&callback,
-                      const std::string &len_tag_key);
+                      const std::string &len_tag_key,
+                      size_t buffer_size);
     ~ofdmradar_rx_impl();
 
     // Where all the action really happens

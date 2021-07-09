@@ -13,6 +13,10 @@ parameters:
   label: Length Tag Key
   dtype: string
   default: "packet_len"
+- id: buffer_size
+  label: Buffer Size
+  dtype: int
+  default: -1
 
 inputs:
 - label: In
@@ -25,7 +29,7 @@ asserts:
 
 templates:
   imports: import ofdmradar
-  make: ofdmradar.ofdmradar_rx(${ofdm_radar_params}, ${callback}, ${len_tag_key})
+  make: ofdmradar.ofdmradar_rx(${ofdm_radar_params}, ${callback}, ${len_tag_key}, ${buffer_size})
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

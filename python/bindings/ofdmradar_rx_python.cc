@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(ofdmradar_rx.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(06cf29fe5c59e8eaad22b2092f7de018)                     */
+/* BINDTOOL_HEADER_FILE_HASH(8aff6c32704574a4b5fd51969c9a2e1c)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -44,7 +44,8 @@ void bind_ofdmradar_rx(py::module &m)
         // .def(py::init(&ofdmradar_rx::make), D(ofdmradar_rx, make))
         .def(py::init([](ofdmradar_params::sptr ofdm_params,
                          std::function<void(py::array_t<const gr_complex>)> &&callback,
-                         const std::string &len_tag_key) {
+                         const std::string &len_tag_key,
+                         size_t buffer_size) {
                     auto cb = callback;
                  return ofdmradar_rx::make(
                      ofdm_params,
@@ -52,7 +53,8 @@ void bind_ofdmradar_rx(py::module &m)
                          py::gil_scoped_acquire acquire;
                          cb(py::array_t<const gr_complex>({ n, m }, ptr));
                      },
-                     len_tag_key);
+                     len_tag_key,
+                     buffer_size);
              }),
              D(ofdmradar_rx, make))
 

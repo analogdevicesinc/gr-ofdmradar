@@ -104,7 +104,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 436.0]
+    coordinate: [72, 580.0]
     rotation: 0
     state: disabled
 - name: analog_sig_source_x_0_0
@@ -126,7 +126,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 572.0]
+    coordinate: [72, 716.0]
     rotation: 0
     state: disabled
 - name: blocks_add_xx_0
@@ -201,7 +201,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [464, 496.0]
+    coordinate: [352, 640.0]
     rotation: 0
     state: disabled
 - name: freq_xlating_fir_filter_xxx_0
@@ -262,6 +262,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
+    buffer_size: (1024+128)*64
     callback: ofdmrx_mod.handle_data
     comment: ''
     len_tag_key: packet_len

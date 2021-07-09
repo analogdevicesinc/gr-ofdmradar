@@ -36,7 +36,8 @@ public:
      */
     static sptr make(ofdmradar_params::sptr ofdm_params,
                      callback_t&& callback,
-                     const std::string &len_tag_key);
+                     const std::string &len_tag_key,
+                     size_t buffer_size);
 };
 
 } // namespace ofdmradar

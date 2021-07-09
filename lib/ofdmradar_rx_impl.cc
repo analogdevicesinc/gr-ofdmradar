@@ -7,18 +7,19 @@
 
 #include "ofdmradar_rx_impl.h"
 #include <gnuradio/io_signature.h>
-#include <cstring>
 #include <cmath>
+#include <cstring>
 
 namespace gr {
 namespace ofdmradar {
 
 ofdmradar_rx::sptr ofdmradar_rx::make(ofdmradar_params::sptr ofdm_params,
                                       callback_t &&callback,
-                                      const std::string &len_tag_key)
+                                      const std::string &len_tag_key,
+                                      size_t buffer_size)
 {
     return gnuradio::make_block_sptr<ofdmradar_rx_impl>(
-        ofdm_params, std::move(callback), len_tag_key);
+        ofdm_params, std::move(callback), len_tag_key, buffer_size);
 }
 
 
@@ -27,7 +28,8 @@ ofdmradar_rx::sptr ofdmradar_rx::make(ofdmradar_params::sptr ofdm_params,
  */
 ofdmradar_rx_impl::ofdmradar_rx_impl(ofdmradar_params::sptr ofdm_params,
                                      callback_t &&callback,
-                                     const std::string &len_tag_key)
+                                     const std::string &len_tag_key,
+                                     size_t buffer_size)
     : gr::sync_block("ofdmradar_rx",
                      gr::io_signature::make(1, 1, sizeof(gr_complex)),
                      gr::io_signature::make(0, 0, 0)),
@@ -35,9 +37,13 @@ ofdmradar_rx_impl::ofdmradar_rx_impl(ofdmradar_params::sptr ofdm_params,
       d_callback(callback),
       d_len_tag_key(pmt::intern(len_tag_key)),
       d_tx_symbols(ofdm_params->carriers() * ofdm_params->symbols()),
-      d_frame_buffer(ofdm_params->carriers() * ofdm_params->symbols())
+      d_frame_buffer(ofdm_params->carriers() * ofdm_params->symbols()),
+      d_buffer_size(buffer_size)
 {
-    this->set_output_multiple(ofdm_params->frame_length());
+    if (buffer_size != (size_t)-1LL)
+        this->set_output_multiple(buffer_size);
+    else
+        this->set_output_multiple(ofdm_params->frame_length());
 
     d_doppler_fft_plan = fftwf_plan_dft_1d(
         d_ofdm_params->symbols(), d_fft_in, d_fft_out, FFTW_FORWARD, FFTW_MEASURE);
@@ -74,10 +80,6 @@ int ofdmradar_rx_impl::work(int noutput_items,
     // Remove tx symbol influence
     for (int i_s = 0; i_s < m; i_s++) {
         for (int i_c = 0; i_c < n; i_c++) {
-            if (std::isnan(d_frame_buffer[i_s * n + i_c].real()))
-                throw std::runtime_error("Ahhh, nan! i_c: " + std::to_string(i_c) +
-                                         ", i_s: " + std::to_string(i_s));
-
             if (d_ofdm_params->carrier_mask()[i_c])
                 d_frame_buffer[i_s * n + i_c] /= d_tx_symbols[i_s * n + i_c];
             else
@@ -95,7 +97,6 @@ int ofdmradar_rx_impl::work(int noutput_items,
 
     // Transform to doppler domain along symbol axis
     for (int i = 0; i < n; i++) {
-        // std::memcpy(d_fft_gr_in, &d_frame_buffer[i*n], sizeof(gr_complex) * n);
         for (int i_s = 0; i_s < m; i_s++)
             d_fft_gr_in[i_s] = d_frame_buffer[i_s * n + i];
 
@@ -103,14 +104,12 @@ int ofdmradar_rx_impl::work(int noutput_items,
 
         for (int i_s = 0; i_s < m; i_s++)
             d_frame_buffer[i_s * n + i] = d_fft_gr_out[i_s];
-
-        // std::memcpy(&d_frame_buffer[i*n], d_fft_gr_out, sizeof(gr_complex) * n);
     }
 
     d_callback(d_frame_buffer.data(), m, n);
 
-    // Tell runtime system how many output items we produced.
-    return noutput_items;
+    // Tell runtime system how many items we consumed
+    return d_buffer_size;
 }
 
 } /* namespace ofdmradar */
