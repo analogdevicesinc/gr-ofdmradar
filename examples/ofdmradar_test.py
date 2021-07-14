@@ -37,7 +37,6 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 import numpy as np
-import ofdmradar_test_ofdmrx_mod as ofdmrx_mod  # embedded python module
 
 
 

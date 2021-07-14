@@ -85,50 +85,6 @@ blocks:
     coordinate: [792, 396.0]
     rotation: 0
     state: true
-- name: analog_sig_source_x_0
-  id: analog_sig_source_x
-  parameters:
-    affinity: ''
-    alias: ''
-    amp: '20'
-    comment: ''
-    freq: '10'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    offset: '0'
-    phase: '0'
-    samp_rate: samp_rate
-    type: float
-    waveform: analog.GR_COS_WAVE
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [72, 580.0]
-    rotation: 0
-    state: disabled
-- name: analog_sig_source_x_0_0
-  id: analog_sig_source_x
-  parameters:
-    affinity: ''
-    alias: ''
-    amp: '5'
-    comment: ''
-    freq: '10'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    offset: '10'
-    phase: '0'
-    samp_rate: samp_rate
-    type: float
-    waveform: analog.GR_SIN_WAVE
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [72, 716.0]
-    rotation: 0
-    state: disabled
 - name: blocks_add_xx_0
   id: blocks_add_xx
   parameters:
@@ -202,26 +158,6 @@ blocks:
     coordinate: [496, 252.0]
     rotation: 0
     state: enabled
-- name: channels_channel_model2_0
-  id: channels_channel_model2
-  parameters:
-    affinity: ''
-    alias: ''
-    block_tags: 'False'
-    comment: ''
-    epsilon: '25'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    noise_voltage: '0'
-    seed: '0'
-    taps: 1.0 + 1.0j
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [352, 640.0]
-    rotation: 0
-    state: disabled
 - name: freq_xlating_fir_filter_xxx_0
   id: freq_xlating_fir_filter_xxx
   parameters:
@@ -325,29 +261,6 @@ blocks:
     coordinate: [80, 244.0]
     rotation: 0
     state: enabled
-- name: ofdmrx_mod
-  id: epy_module
-  parameters:
-    alias: ''
-    comment: ''
-    source_code: "# this module will be imported in the into your flowgraph\n\nimport\
-      \ numpy as np\nimport matplotlib\nimport matplotlib.pyplot as plt\n\ncounter\
-      \ = 0\nrunning_sum = np.zeros((1024, 64), dtype=float)\n\ndef handle_data(data):\n\
-      \    global counter,running_sum\n    return\n    estimate = np.fft.fftshift(data,\
-      \ axes=[0])\n    estimate = np.transpose(estimate)\n\n    matplotlib.use(\"\
-      agg\")\n    plt.figure(figsize=(8, 10))\n    running_sum += np.abs(estimate)[::-1,:]\n\
-      \    plt.imshow(running_sum, interpolation=\"none\", aspect=1/2, extent=[-32,\
-      \ 31, 0, 1023])\n    # plt.imshow(np.transpose(np.abs(data)))\n    # plt.colorbar()\n\
-      \    plt.ylim([0, 200])\n    plt.ylabel(\"Distance\")\n    plt.xlabel(\"Doppler\"\
-      );\n    ofile = f\"/tmp/periodograms/{counter:03}.png\"\n\n    plt.savefig(ofile)\n\
-      \    plt.close()\n    counter += 1\n    # print(f\"Wrote: {ofile}\")\n"
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [8, 108.0]
-    rotation: 0
-    state: true
 - name: qtgui_freq_sink_x_0
   id: qtgui_freq_sink_x
   parameters:
@@ -610,8 +523,6 @@ blocks:
 
 connections:
 - [analog_fastnoise_source_x_0, '0', blocks_add_xx_0, '2']
-- [analog_sig_source_x_0, '0', channels_channel_model2_0, '1']
-- [analog_sig_source_x_0_0, '0', channels_channel_model2_0, '2']
 - [blocks_add_xx_0, '0', ofdmradar_ofdmradar_rx_0, '0']
 - [blocks_add_xx_0, '0', qtgui_freq_sink_x_0, '0']
 - [blocks_add_xx_0, '0', qtgui_time_sink_x_0, '0']
