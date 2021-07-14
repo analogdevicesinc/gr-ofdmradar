@@ -15,7 +15,13 @@ list(APPEND ofdmradar_sources
     ofdmradar_impl.cc
     ofdmradar_tx_impl.cc
     ofdmradar_rx_impl.cc
+    ofdmradar_gui_impl.cc
+    gui/ofdmradar_widget.cc
+    gui/ofdmradar_screen.cc
+    gui/ofdmradar_controls.cc
 )
+
+qt5_add_resources(ofdmradar_sources resources/resources.qrc)
 
 set(ofdmradar_sources "${ofdmradar_sources}" PARENT_SCOPE)
 if(NOT ofdmradar_sources)
@@ -24,12 +30,24 @@ if(NOT ofdmradar_sources)
 endif(NOT ofdmradar_sources)
 
 add_library(gnuradio-ofdmradar SHARED ${ofdmradar_sources})
-target_link_libraries(gnuradio-ofdmradar gnuradio::gnuradio-runtime fftw3f::fftw3f)
+target_link_libraries(gnuradio-ofdmradar gnuradio::gnuradio-runtime gnuradio::gnuradio-blocks gnuradio::gnuradio-fft gnuradio::gnuradio-filter gnuradio::gnuradio-qtgui fftw3f::fftw3f qwt::qwt Qt5::Widgets)
 target_include_directories(gnuradio-ofdmradar
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
   )
 set_target_properties(gnuradio-ofdmradar PROPERTIES DEFINE_SYMBOL "gnuradio_ofdmradar_EXPORTS")
+
+target_compile_definitions(gnuradio-ofdmradar PRIVATE -DQWT_DLL)
+
+set(ofdmradar_mod_includedir ${CMAKE_CURRENT_SOURCE_DIR}/gui)
+QT5_WRAP_CPP(qt_moc_sources
+    ${ofdmradar_mod_includedir}/ofdmradar_widget.h
+    ${ofdmradar_mod_includedir}/ofdmradar_screen.h
+    ${ofdmradar_mod_includedir}/ofdmradar_controls.h
+    )
+target_sources(gnuradio-ofdmradar PRIVATE ${qt_moc_sources})
+# QT5 _WRAP_UI(qt_ui_hdrs test.ui)
+# target_sources(gnuradio-ofdmradar PRIVATE ${qt_ui_hdrs})
 
 if(APPLE)
     set_target_properties(gnuradio-ofdmradar PROPERTIES

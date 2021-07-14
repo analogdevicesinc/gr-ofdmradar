@@ -25,6 +25,7 @@ from PyQt5 import Qt
 from gnuradio import qtgui
 from gnuradio.filter import firdes
 import sip
+import ofdmradar
 from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import filter
@@ -36,7 +37,6 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 import numpy as np
-import ofdmradar
 import ofdmradar_test_ofdmrx_mod as ofdmrx_mod  # embedded python module
 
 
@@ -79,7 +79,7 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 1048576
+        self.samp_rate = samp_rate = 250e6
         self.radar_params = radar_params = ofdmradar.ofdmradar_params(1024,
           64,
           128,
@@ -132,7 +132,11 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
             self.qtgui_freq_sink_x_0_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_freq_sink_x_0_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0_0.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_0_win, 0, 0, 1, 1)
+        for r in range(0, 1):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_freq_sink_x_0 = qtgui.freq_sink_c(
             4096, #size
             window.WIN_BLACKMAN_hARRIS, #wintype
@@ -174,15 +178,27 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
             self.qtgui_freq_sink_x_0.set_line_alpha(i, alphas[i])
 
         self._qtgui_freq_sink_x_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0.pyqwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_freq_sink_x_0_win)
+        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_win, 1, 0, 1, 1)
+        for r in range(1, 2):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(0, 1):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.ofdmradar_ofdmradar_tx_0 = ofdmradar.ofdmradar_tx(radar_params, 'packet_len')
-        self.ofdmradar_ofdmradar_rx_0 = ofdmradar.ofdmradar_rx(radar_params, ofdmrx_mod.handle_data, 'packet_len', (1024+128)*64)
+        self.ofdmradar_ofdmradar_rx_0 = ofdmradar.ofdmradar_rx(radar_params, 'packet_len', radar_params.frame_length)
+        self.ofdmradar_ofdmradar_gui_0 = ofdmradar.ofdmradar_gui(radar_params, None)
+        self._ofdmradar_ofdmradar_gui_0_win = sip.wrapinstance(self.ofdmradar_ofdmradar_gui_0.pyqwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._ofdmradar_ofdmradar_gui_0_win, 0, 1, 2, 1)
+        for r in range(0, 2):
+            self.top_grid_layout.setRowStretch(r, 1)
+        for c in range(1, 2):
+            self.top_grid_layout.setColumnStretch(c, 1)
         self.freq_xlating_fir_filter_xxx_0_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*99 + [0.1] + [0]*10 + [0.4] + [0]*10, -200, samp_rate)
-        self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*50 + [0.3] + [0]*30 + [0.1] + [0]*10, 100, samp_rate)
+        self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*50 + [0.3] + [0]*30 + [0.1] + [0]*10, 30, samp_rate)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, 1048576,True)
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_cc(5e-5)
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(1e-3)
         self.blocks_add_xx_0 = blocks.add_vcc(1)
-        self.analog_fastnoise_source_x_0 = analog.fastnoise_source_c(analog.GR_GAUSSIAN, 0.5, 0, 8192)
+        self.analog_fastnoise_source_x_0 = analog.fastnoise_source_c(analog.GR_GAUSSIAN, 0.05, 0, 8192)
 
 
 
@@ -193,11 +209,13 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_add_xx_0, 0), (self.ofdmradar_ofdmradar_rx_0, 0))
         self.connect((self.blocks_add_xx_0, 0), (self.qtgui_freq_sink_x_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_throttle_0, 0))
+        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.ofdmradar_ofdmradar_gui_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.freq_xlating_fir_filter_xxx_0_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.qtgui_freq_sink_x_0_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.blocks_add_xx_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0_0, 0), (self.blocks_add_xx_0, 1))
+        self.connect((self.ofdmradar_ofdmradar_rx_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
         self.connect((self.ofdmradar_ofdmradar_tx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
 
 

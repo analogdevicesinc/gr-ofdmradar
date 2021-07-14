@@ -4,3 +4,6 @@
 build*/
 examples/grc/*.py
 **/.ipynb_checkpoints/
+cscope.*
+tags
+tags.files

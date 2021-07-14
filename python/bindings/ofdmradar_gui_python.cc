@@ -13,30 +13,33 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(ofdmradar_rx.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(3414504ebbcd833ddfd0bdb784addf19)                     */
+/* BINDTOOL_HEADER_FILE(ofdmradar_gui.h)                                        */
+/* BINDTOOL_HEADER_FILE_HASH(aa14d49ea7415ddc7d28aa28a5911697)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
-#include <pybind11/functional.h>
-#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <QWidget>
+
 namespace py = pybind11;
 
-#include <ofdmradar/ofdmradar_rx.h>
+#include <ofdmradar/ofdmradar_gui.h>
 // pydoc.h is automatically generated in the build directory
-#include <ofdmradar_rx_pydoc.h>
+#include <ofdmradar_gui_pydoc.h>
 
-void bind_ofdmradar_rx(py::module &m)
+void bind_ofdmradar_gui(py::module &m)
 {
+    using ofdmradar_gui = gr::ofdmradar::ofdmradar_gui;
 
-    using ofdmradar_params = gr::ofdmradar::ofdmradar_params;
-    using ofdmradar_rx = gr::ofdmradar::ofdmradar_rx;
+    py::class_<ofdmradar_gui, gr::block, gr::basic_block, std::shared_ptr<ofdmradar_gui>>(
+        m, "ofdmradar_gui", D(ofdmradar_gui))
 
-    py::class_<ofdmradar_rx, gr::block, gr::basic_block, std::shared_ptr<ofdmradar_rx>>(
-        m, "ofdmradar_rx", D(ofdmradar_rx))
+        .def(py::init(&ofdmradar_gui::make),
+             py::arg("ofdm_params"),
+             py::arg("parent") = nullptr,
+             D(ofdmradar_gui, make))
 
-        .def(py::init(&ofdmradar_rx::make), D(ofdmradar_rx, make));
+        .def("pyqwidget", &ofdmradar_gui::pyqwidget);
 }

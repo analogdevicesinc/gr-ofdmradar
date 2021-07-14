@@ -6,9 +6,6 @@ parameters:
 - id: ofdm_radar_params
   label: OFDM Radar Params
   dtype: raw
-- id: callback
-  label: Callback
-  dtype: raw
 - id: len_tag_key
   label: Length Tag Key
   dtype: string
@@ -24,12 +21,15 @@ inputs:
   dtype: complex
   optional: false
 
-asserts:
-  - ${( callable(callback) )}
+outputs:
+- label: Out
+  domain: stream
+  dtype: complex
+  optional: false
 
 templates:
   imports: import ofdmradar
-  make: ofdmradar.ofdmradar_rx(${ofdm_radar_params}, ${callback}, ${len_tag_key}, ${buffer_size})
+  make: ofdmradar.ofdmradar_rx(${ofdm_radar_params}, ${len_tag_key}, ${buffer_size})
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

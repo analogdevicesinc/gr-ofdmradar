@@ -20,25 +20,29 @@ namespace ofdmradar {
 class ofdmradar_rx_impl : public ofdmradar_rx, ofdmradar_shared
 {
 private:
-    callback_t d_callback;
     pmt::pmt_t d_len_tag_key;
+    size_t d_out_size;
     std::vector<gr_complex> d_tx_symbols;
     std::vector<tag_t> d_tags;
-    std::vector<gr_complex> d_frame_buffer;
     fftwf_plan d_doppler_fft_plan;
     size_t d_buffer_size;
 
 public:
     ofdmradar_rx_impl(ofdmradar_params::sptr ofdm_params,
-                      callback_t &&callback,
                       const std::string &len_tag_key,
                       size_t buffer_size);
     ~ofdmradar_rx_impl();
 
-    // Where all the action really happens
+    int general_work(int noutput_items,
+                     gr_vector_int &ninput_items,
+                     gr_vector_const_void_star &input_items,
+                     gr_vector_void_star &output_items) override;
+
     int work(int noutput_items,
              gr_vector_const_void_star &input_items,
              gr_vector_void_star &output_items);
+
+    void forecast(int noutput_items, gr_vector_int &ninput_items_required) override;
 };
 
 } // namespace ofdmradar

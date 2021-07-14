@@ -8,7 +8,7 @@
 #ifndef INCLUDED_OFDMRADAR_OFDMRADAR_RX_H
 #define INCLUDED_OFDMRADAR_OFDMRADAR_RX_H
 
-#include <gnuradio/sync_block.h>
+#include <gnuradio/block.h>
 #include <ofdmradar/api.h>
 #include <ofdmradar/ofdmradar.h>
 
@@ -20,11 +20,10 @@ namespace ofdmradar {
  * \ingroup ofdmradar
  *
  */
-class OFDMRADAR_API ofdmradar_rx : virtual public gr::sync_block
+class OFDMRADAR_API ofdmradar_rx : virtual public gr::block
 {
 public:
     typedef std::shared_ptr<ofdmradar_rx> sptr;
-    typedef std::function<void(const gr_complex *, size_t, size_t)> callback_t;
 
     /*!
      * \brief Return a shared_ptr to a new instance of ofdmradar::ofdmradar_rx.
@@ -35,7 +34,6 @@ public:
      * creating new instances.
      */
     static sptr make(ofdmradar_params::sptr ofdm_params,
-                     callback_t&& callback,
                      const std::string &len_tag_key,
                      size_t buffer_size);
 };

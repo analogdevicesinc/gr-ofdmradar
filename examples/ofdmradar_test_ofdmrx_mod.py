@@ -9,6 +9,7 @@ running_sum = np.zeros((1024, 64), dtype=float)
 
 def handle_data(data):
     global counter,running_sum
+    return
     estimate = np.fft.fftshift(data, axes=[0])
     estimate = np.transpose(estimate)
 

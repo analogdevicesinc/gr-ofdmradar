@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>screen.frag</file>
+    <file>screen.vert</file>
+</qresource>
+</RCC>

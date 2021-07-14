@@ -31,7 +31,8 @@ include(GrPybind)
 list(APPEND ofdmradar_python_files
     ofdmradar_python.cc
     ofdmradar_tx_python.cc
-    ofdmradar_rx_python.cc python_bindings.cc)
+    ofdmradar_rx_python.cc
+    ofdmradar_gui_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(ofdmradar 
    ../..

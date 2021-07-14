@@ -75,6 +75,7 @@ ENDIF()
 ########################################################################
 include(FindPkgConfig)
 find_package(Gnuradio "3.9" REQUIRED)
+find_package(Gnuradio COMPONENTS filter fft blocks qtgui REQUIRED)
 include(GrVersion)
 
 include(GrPlatform) #define LIB_SUFFIX
@@ -114,7 +115,11 @@ endif(APPLE)
 # Find gnuradio build dependencies
 ########################################################################
 find_package(Doxygen)
-find_package(FFTW3f)
+find_package(FFTW3f REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qwt REQUIRED)
+
+GR_PYTHON_CHECK_MODULE("PyQt5" PyQt5 True PYQT5_FOUND)
 
 ########################################################################
 # PyBind11 Related

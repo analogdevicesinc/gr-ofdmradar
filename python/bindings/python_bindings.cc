@@ -24,6 +24,7 @@ namespace py = pybind11;
     void bind_ofdmradar(py::module& m);
     void bind_ofdmradar_tx(py::module& m);
     void bind_ofdmradar_rx(py::module& m);
+    void bind_ofdmradar_gui(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -55,5 +56,6 @@ PYBIND11_MODULE(ofdmradar_python, m)
     bind_ofdmradar(m);
     bind_ofdmradar_tx(m);
     bind_ofdmradar_rx(m);
+    bind_ofdmradar_gui(m);
     // ) END BINDING_FUNCTION_CALLS
 }

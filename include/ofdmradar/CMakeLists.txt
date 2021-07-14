@@ -13,6 +13,7 @@ install(FILES
     api.h
     ofdmradar.h
     ofdmradar_tx.h
-    ofdmradar_rx.h DESTINATION include/ofdmradar
+    ofdmradar_rx.h
+    ofdmradar_gui.h DESTINATION include/ofdmradar
 
 )

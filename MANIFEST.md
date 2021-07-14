@@ -1,4 +1,4 @@
-title: The OFDMRADAR OOT Module
+title: The OFDM-Radar OOT Module
 brief: Implements an OFDM Radar including visualisation
 tags:
   - sdr

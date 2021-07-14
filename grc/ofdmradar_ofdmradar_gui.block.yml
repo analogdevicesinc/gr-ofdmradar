@@ -1,0 +1,36 @@
+id: ofdmradar_ofdmradar_gui
+label: OFDM Radar GUI
+category: '[ofdmradar]'
+
+
+parameters:
+- id: ofdm_params
+  label: OFDM Radar Params
+  dtype: raw
+- id: gui_hint
+  label: GUI Hint
+  dtype: gui_hint
+  hide: part
+
+inputs:
+- label: In
+  domain: stream
+  dtype: complex
+  optional: false
+
+templates:
+  imports: |-
+    from PyQt5 import Qt
+    import ofdmradar
+    import sip
+  make: |-
+    <%
+        win = 'self._%s_win'%id
+    %>\
+    ofdmradar.ofdmradar_gui(${ofdm_params}, None)
+    ${win} = sip.wrapinstance(self.${id}.pyqwidget(), Qt.QWidget)
+    ${gui_hint() % win}
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1

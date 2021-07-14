@@ -15,10 +15,10 @@
  */
 
 
-static const char *__doc_gr_ofdmradar_ofdmradar_tx = R"doc()doc";
+static const char *__doc_gr_ofdmradar_ofdmradar_gui = R"doc()doc";
 
 
-static const char *__doc_gr_ofdmradar_ofdmradar_tx_ofdmradar_tx = R"doc()doc";
+static const char *__doc_gr_ofdmradar_ofdmradar_gui_ofdmradar_gui = R"doc()doc";
 
 
-static const char *__doc_gr_ofdmradar_ofdmradar_tx_make = R"doc()doc";
+static const char *__doc_gr_ofdmradar_ofdmradar_gui_make = R"doc()doc";

@@ -26,9 +26,9 @@ class ofdmradar_tx_impl : public ofdmradar_tx, ofdmradar_shared
 
     void generate_symbol(gr_complex *out);
     void generate_frame(gr_complex *out);
+
 public:
-    ofdmradar_tx_impl(ofdmradar_params::sptr ofdm_params,
-                      const std::string &len_tag_key);
+    ofdmradar_tx_impl(ofdmradar_params::sptr ofdm_params, const std::string &len_tag_key);
     ~ofdmradar_tx_impl();
 
     // Where all the action really happens

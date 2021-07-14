@@ -9,5 +9,6 @@
 install(FILES
     ofdmradar_ofdmradar_tx.block.yml
     ofdmradar_ofdmradar_params.block.yml
-    ofdmradar_ofdmradar_rx.block.yml DESTINATION share/gnuradio/grc/blocks
+    ofdmradar_ofdmradar_rx.block.yml
+    ofdmradar_ofdmradar_gui.block.yml DESTINATION share/gnuradio/grc/blocks
 )

@@ -57,7 +57,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '1048576'
+    value: 250e6
   states:
     bus_sink: false
     bus_source: false
@@ -70,7 +70,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    amp: '0.5'
+    amp: '0.05'
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -165,6 +165,24 @@ blocks:
     coordinate: [328, 252.0]
     rotation: 0
     state: enabled
+- name: blocks_multiply_const_vxx_0_0
+  id: blocks_multiply_const_vxx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: 5e-5
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [752, 524.0]
+    rotation: 180
+    state: enabled
 - name: blocks_throttle_0
   id: blocks_throttle
   parameters:
@@ -209,7 +227,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    center_freq: '100'
+    center_freq: '30'
     comment: ''
     decim: '1'
     maxoutbuf: '0'
@@ -257,23 +275,39 @@ blocks:
     coordinate: [280, 12.0]
     rotation: 0
     state: true
+- name: ofdmradar_ofdmradar_gui_0
+  id: ofdmradar_ofdmradar_gui
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    gui_hint: 0, 1, 2, 1
+    ofdm_params: radar_params
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [472, 524.0]
+    rotation: 180
+    state: true
 - name: ofdmradar_ofdmradar_rx_0
   id: ofdmradar_ofdmradar_rx
   parameters:
     affinity: ''
     alias: ''
-    buffer_size: (1024+128)*64
-    callback: ofdmrx_mod.handle_data
+    buffer_size: radar_params.frame_length
     comment: ''
     len_tag_key: packet_len
+    maxoutbuf: '0'
+    minoutbuf: '0'
     ofdm_radar_params: radar_params
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1192, 356.0]
-    rotation: 0
-    state: true
+    coordinate: [928, 508.0]
+    rotation: 180
+    state: enabled
 - name: ofdmradar_ofdmradar_tx_0
   id: ofdmradar_ofdmradar_tx
   parameters:
@@ -299,14 +333,14 @@ blocks:
     source_code: "# this module will be imported in the into your flowgraph\n\nimport\
       \ numpy as np\nimport matplotlib\nimport matplotlib.pyplot as plt\n\ncounter\
       \ = 0\nrunning_sum = np.zeros((1024, 64), dtype=float)\n\ndef handle_data(data):\n\
-      \    global counter,running_sum\n    estimate = np.fft.fftshift(data, axes=[0])\n\
-      \    estimate = np.transpose(estimate)\n\n    matplotlib.use(\"agg\")\n    plt.figure(figsize=(8,\
-      \ 10))\n    running_sum += np.abs(estimate)[::-1,:]\n    plt.imshow(running_sum,\
-      \ interpolation=\"none\", aspect=1/2, extent=[-32, 31, 0, 1023])\n    # plt.imshow(np.transpose(np.abs(data)))\n\
-      \    # plt.colorbar()\n    plt.ylim([0, 200])\n    plt.ylabel(\"Distance\")\n\
-      \    plt.xlabel(\"Doppler\");\n    ofile = f\"/tmp/periodograms/{counter:03}.png\"\
-      \n\n    plt.savefig(ofile)\n    plt.close()\n    counter += 1\n    # print(f\"\
-      Wrote: {ofile}\")\n"
+      \    global counter,running_sum\n    return\n    estimate = np.fft.fftshift(data,\
+      \ axes=[0])\n    estimate = np.transpose(estimate)\n\n    matplotlib.use(\"\
+      agg\")\n    plt.figure(figsize=(8, 10))\n    running_sum += np.abs(estimate)[::-1,:]\n\
+      \    plt.imshow(running_sum, interpolation=\"none\", aspect=1/2, extent=[-32,\
+      \ 31, 0, 1023])\n    # plt.imshow(np.transpose(np.abs(data)))\n    # plt.colorbar()\n\
+      \    plt.ylim([0, 200])\n    plt.ylabel(\"Distance\")\n    plt.xlabel(\"Doppler\"\
+      );\n    ofile = f\"/tmp/periodograms/{counter:03}.png\"\n\n    plt.savefig(ofile)\n\
+      \    plt.close()\n    counter += 1\n    # print(f\"Wrote: {ofile}\")\n"
   states:
     bus_sink: false
     bus_source: false
@@ -349,7 +383,7 @@ blocks:
     fftsize: '4096'
     freqhalf: 'True'
     grid: 'False'
-    gui_hint: ''
+    gui_hint: 1, 0, 1, 1
     label: Relative Gain
     label1: ''
     label10: ''''''
@@ -430,7 +464,7 @@ blocks:
     fftsize: '4096'
     freqhalf: 'True'
     grid: 'False'
-    gui_hint: ''
+    gui_hint: 0, 0, 1, 1
     label: Relative Gain
     label1: ''
     label10: ''''''
@@ -582,11 +616,13 @@ connections:
 - [blocks_add_xx_0, '0', qtgui_freq_sink_x_0, '0']
 - [blocks_add_xx_0, '0', qtgui_time_sink_x_0, '0']
 - [blocks_multiply_const_vxx_0, '0', blocks_throttle_0, '0']
+- [blocks_multiply_const_vxx_0_0, '0', ofdmradar_ofdmradar_gui_0, '0']
 - [blocks_throttle_0, '0', freq_xlating_fir_filter_xxx_0, '0']
 - [blocks_throttle_0, '0', freq_xlating_fir_filter_xxx_0_0, '0']
 - [blocks_throttle_0, '0', qtgui_freq_sink_x_0_0, '0']
 - [freq_xlating_fir_filter_xxx_0, '0', blocks_add_xx_0, '0']
 - [freq_xlating_fir_filter_xxx_0_0, '0', blocks_add_xx_0, '1']
+- [ofdmradar_ofdmradar_rx_0, '0', blocks_multiply_const_vxx_0_0, '0']
 - [ofdmradar_ofdmradar_tx_0, '0', blocks_multiply_const_vxx_0, '0']
 
 metadata:
