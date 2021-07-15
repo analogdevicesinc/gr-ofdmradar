@@ -23,6 +23,7 @@ class ofdmradar_tx_impl : public ofdmradar_tx, ofdmradar_shared
 {
     const pmt::pmt_t d_len_tag_key;
     std::vector<gr_complex> d_frame_buffer;
+    size_t d_running_idx = 0;
 
     void generate_symbol(gr_complex *out);
     void generate_frame(gr_complex *out);

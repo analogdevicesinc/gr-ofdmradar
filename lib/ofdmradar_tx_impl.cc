@@ -9,6 +9,7 @@
 
 #include <gnuradio/io_signature.h>
 
+#include <algorithm>
 #include <cstring>
 
 namespace gr {
@@ -32,9 +33,8 @@ ofdmradar_tx_impl::ofdmradar_tx_impl(ofdmradar_params::sptr ofdm_params,
       d_frame_buffer(ofdm_params->frame_length()),
       d_len_tag_key(pmt::intern(len_tag_key))
 {
-    this->set_output_multiple(ofdm_params->frame_length());
-
     generate_frame(d_frame_buffer.data());
+    set_output_multiple(0x1000);
 }
 
 void ofdmradar_tx_impl::generate_symbol(gr_complex *out)
@@ -70,16 +70,25 @@ int ofdmradar_tx_impl::work(int noutput_items,
 {
     gr_complex *out = reinterpret_cast<gr_complex *>(output_items[0]);
 
-    if (noutput_items < d_ofdm_params->frame_length())
-        throw std::runtime_error("ofdmradar_tx: Didn't get enough output items?!");
+    if (noutput_items < 0)
+        throw std::runtime_error("Negative noutput_items?!");
 
-    std::memcpy(out, d_frame_buffer.data(), sizeof(gr_complex) * d_frame_buffer.size());
-    add_item_tag(0,
-                 nitems_written(0),
-                 d_len_tag_key,
-                 pmt::from_long(d_ofdm_params->frame_length()));
+    int items = std::min<int>(noutput_items, d_frame_buffer.size() - d_running_idx);
 
-    return d_ofdm_params->frame_length();
+    // Beginning of new packet?
+    if (!d_running_idx) {
+        add_item_tag(0,
+                     nitems_written(0),
+                     d_len_tag_key,
+                     pmt::from_long(d_frame_buffer.size()));
+    }
+    std::memcpy(out, &d_frame_buffer[d_running_idx], sizeof(gr_complex) * items);
+
+    d_running_idx += items;
+    if (d_running_idx == d_frame_buffer.size())
+        d_running_idx = 0;
+
+    return items;
 }
 
 } /* namespace ofdmradar */

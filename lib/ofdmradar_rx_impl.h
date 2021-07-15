@@ -23,9 +23,14 @@ private:
     pmt::pmt_t d_len_tag_key;
     size_t d_out_size;
     std::vector<gr_complex> d_tx_symbols;
+    size_t d_symbol_idx = 0;
+    size_t d_wr_symbol_idx = 0;
+    size_t d_carrier_idx = 0;
+    std::vector<gr_complex> d_frame_buffer;
     std::vector<tag_t> d_tags;
     fftwf_plan d_doppler_fft_plan;
     size_t d_buffer_size;
+    size_t d_total_consumed = 0;
 
 public:
     ofdmradar_rx_impl(ofdmradar_params::sptr ofdm_params,
@@ -37,10 +42,6 @@ public:
                      gr_vector_int &ninput_items,
                      gr_vector_const_void_star &input_items,
                      gr_vector_void_star &output_items) override;
-
-    int work(int noutput_items,
-             gr_vector_const_void_star &input_items,
-             gr_vector_void_star &output_items);
 
     void forecast(int noutput_items, gr_vector_int &ninput_items_required) override;
 };
