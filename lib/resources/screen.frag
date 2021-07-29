@@ -5,6 +5,7 @@ uniform int height;
 uniform float minV;
 uniform float maxV;
 uniform float rangeV;
+uniform float dopplerRangeV;
 
 uniform sampler2D screenData;
 
@@ -48,11 +49,12 @@ float fftshift(in float x) {
 
 void main()
 {
-    vec2 texCoords = vec2(clamp(gl_FragCoord.y / height * rangeV, 0, 1),
-            fftshift(gl_FragCoord.x / width));
+    float xCoord = fftshift((gl_FragCoord.x / width - 0.5) * dopplerRangeV + 0.5);
+
+    vec2 texCoords = vec2(clamp(gl_FragCoord.y / height * rangeV, 0, 1), xCoord);
 
     vec2 texColor = texture(screenData, texCoords).rg;
-    float intensity = sqrt(texColor.r * texColor.r + texColor.g * texColor.g);
-    intensity = clamp((intensity - minV) / (maxV - minV), 0, 1);
+    float intensity = texColor.r * texColor.r + texColor.g * texColor.g;
+    intensity = clamp((intensity - minV*minV) / (maxV*maxV - minV*minV), 0, 1);
     color = vec4(TurboColormap(intensity), 0);
 }

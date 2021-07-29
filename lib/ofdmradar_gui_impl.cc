@@ -29,7 +29,7 @@ ofdmradar_gui_impl::ofdmradar_gui_impl(ofdmradar_params::sptr ofdm_params,
                      gr::io_signature::make(0, 0, 0)),
       d_parent(parent),
       d_ofdm_params(ofdm_params),
-      d_buffer_size(ofdm_params->carriers() * ofdm_params->symbols())
+      d_buffer_size(ofdm_params->peri_length())
 {
     this->set_output_multiple(d_buffer_size);
     initialize_qt();
@@ -50,7 +50,7 @@ void ofdmradar_gui_impl::initialize_qt()
         d_qApplication = qApp;
     } else {
         // Yes, this is technically a leak, but its size is insiginificant, and the
-        // QT Application requires writable storage with a lifetime of >= that of the
+        // QT Application requires writable storage with a lifetime >= that of the
         // qApplication.
         char *arg = new char;
         char **argv = new char *;

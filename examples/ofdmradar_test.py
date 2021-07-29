@@ -7,7 +7,7 @@
 # GNU Radio Python Flow Graph
 # Title: Not titled yet
 # Author: david
-# GNU Radio version: v3.10.0.0git-428-g71f80ae2
+# GNU Radio version: v3.10.0.0git-429-gc594f34a
 
 from distutils.version import StrictVersion
 
@@ -80,10 +80,13 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
         ##################################################
         self.samp_rate = samp_rate = 250e6
         self.radar_params = radar_params = ofdmradar.ofdmradar_params(1024,
-          64,
+          128,
+          4096,
+          1024,
           128,
           1,
           64,
+          window.WIN_HAMMING,
           ofdmradar.get_constellation(ofdmradar.modulation_scheme.BPSK, 4),
           0)
 
@@ -192,22 +195,26 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
         for c in range(1, 2):
             self.top_grid_layout.setColumnStretch(c, 1)
         self.freq_xlating_fir_filter_xxx_0_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*99 + [0.1] + [0]*10 + [0.4] + [0]*10, -200, samp_rate)
-        self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*50 + [0.3] + [0]*30 + [0.1] + [0]*10, 30, samp_rate)
+        self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*50 + [0.3] + [0]*30 + [0.1] + [0]*10, 30000, samp_rate)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, 1048576,True)
-        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_cc(5e-5)
+        self.blocks_probe_rate_0 = blocks.probe_rate(gr.sizeof_gr_complex*1, 500.0, 0.15)
+        self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_cc(10)
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(1e-3)
+        self.blocks_message_debug_0 = blocks.message_debug(True)
         self.blocks_add_xx_0 = blocks.add_vcc(1)
-        self.analog_fastnoise_source_x_0 = analog.fastnoise_source_c(analog.GR_GAUSSIAN, 0.05, 0, 8192)
+        self.analog_fastnoise_source_x_0 = analog.fastnoise_source_c(analog.GR_GAUSSIAN, 0.1, 0, 8192)
 
 
 
         ##################################################
         # Connections
         ##################################################
+        self.msg_connect((self.blocks_probe_rate_0, 'rate'), (self.blocks_message_debug_0, 'print'))
         self.connect((self.analog_fastnoise_source_x_0, 0), (self.blocks_add_xx_0, 2))
         self.connect((self.blocks_add_xx_0, 0), (self.ofdmradar_ofdmradar_rx_0, 0))
         self.connect((self.blocks_add_xx_0, 0), (self.qtgui_freq_sink_x_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_throttle_0, 0))
+        self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.blocks_probe_rate_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.ofdmradar_ofdmradar_gui_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.freq_xlating_fir_filter_xxx_0_0, 0))

@@ -7,8 +7,10 @@
 
 #include "ofdmradar_impl.h"
 
-#include <gnuradio/io_signature.h>
 #include <ofdmradar/ofdmradar.h>
+
+#include <gnuradio/fft/window.h>
+#include <gnuradio/io_signature.h>
 
 #include <boost/format.hpp>
 
@@ -102,44 +104,81 @@ std::vector<gr_complex> get_constellation(modulation_scheme scheme, int order)
 
 ofdmradar_params::sptr ofdmradar_params::make(unsigned int carriers,
                                               unsigned int symbols,
+                                              unsigned int peri_carriers,
+                                              unsigned int peri_symbols,
                                               unsigned int cyclic_prefix_length,
                                               unsigned int dc_guard,
                                               unsigned int nyquist_guard,
+                                              int window_type,
                                               std::vector<gr_complex> constellation,
                                               unsigned int seed)
 {
     return std::make_shared<ofdmradar_params>(carriers,
                                               symbols,
+                                              peri_carriers,
+                                              peri_symbols,
                                               cyclic_prefix_length,
                                               dc_guard,
                                               nyquist_guard,
+                                              window_type,
                                               std::move(constellation),
                                               seed);
 }
 
 ofdmradar_params::ofdmradar_params(unsigned int carriers,
                                    unsigned int symbols,
+                                   unsigned int peri_carriers,
+                                   unsigned int peri_symbols,
                                    unsigned int cyclic_prefix_length,
                                    unsigned int dc_guard,
                                    unsigned int nyquist_guard,
+                                   int window_type,
                                    std::vector<gr_complex> constellation,
                                    unsigned int seed)
     : d_carriers(carriers),
       d_symbols(symbols),
+      d_peri_carriers(peri_carriers),
+      d_peri_symbols(peri_symbols),
       d_cyclic_prefix_length(cyclic_prefix_length),
       d_dc_guard(dc_guard),
       d_nyquist_guard(nyquist_guard),
+      d_window_type(window_type),
       d_constellation(std::move(constellation)),
       d_seed(seed),
       d_symbol_length(carriers + cyclic_prefix_length),
       d_frame_length(d_symbol_length * symbols),
       d_carrier_mask(carriers)
 {
+    if (peri_carriers < carriers)
+        throw std::runtime_error(
+            boost::str(boost::format("ofdmradar_params: Periodogram carriers (%u) must "
+                                     "be >= ofdm carriers (%u)!") %
+                       peri_carriers % carriers));
+
+    if (peri_symbols < symbols)
+        throw std::runtime_error(
+            boost::str(boost::format("ofdmradar_params: Periodogram symbols (%u) must be "
+                                     ">= ofdm symbols (%u)!") %
+                       peri_symbols % symbols));
+
     // Generate carrier mask
     for (size_t i = 0; i < d_carrier_mask.size(); i++)
-        d_carrier_mask[i] = !(i >= carriers - dc_guard || i <= dc_guard) &&
+        d_carrier_mask[i] = !(i > carriers - dc_guard || i < dc_guard) &&
                             (i + nyquist_guard - (carriers / 2) >= nyquist_guard * 2);
 }
+
+std::vector<float> ofdmradar_params::window(int taps) const
+{
+    return gr::fft::window::build(static_cast<gr::fft::window::win_type>(d_window_type), taps);
+}
+
+#if 0
+unsigned int ofdmradar_params::peri_height() const
+{
+    return peri_carriers();
+    // return d_cyclic_prefix_length * (d_peri_symbols / d_symbols);
+}
+#endif
 
 namespace {
 
@@ -163,7 +202,7 @@ std::string constellation_to_string(const std::vector<gr_complex> cst)
 
 } // namespace
 
-std::string ofdmradar_params::python_str()
+std::string ofdmradar_params::python_str() const
 {
     return boost::str(
         boost::format(
@@ -173,7 +212,7 @@ std::string ofdmradar_params::python_str()
         constellation_to_string(constellation()) % seed());
 }
 
-std::string ofdmradar_params::python_repr()
+std::string ofdmradar_params::python_repr() const
 {
     return boost::str(boost::format("ofdmradar_params(carriers=%u, symbols=%u, "
                                     "cyclic_prefix_length=%u, dc_guard=%u, "
@@ -192,8 +231,11 @@ ofdmradar_shared::ofdmradar_shared(ofdmradar_params::sptr ofdm_params)
       d_generator(ofdm_params->seed()),
       d_distribution(0, ofdm_params->constellation().size() - 1)
 {
-    auto fft_size =
-        std::max(ofdm_params->carriers(), ofdm_params->symbols()) * sizeof(fftwf_complex);
+    auto fft_size = std::max({ ofdm_params->carriers(),
+                               ofdm_params->symbols(),
+                               ofdm_params->peri_carriers(),
+                               ofdm_params->peri_symbols() }) *
+                    sizeof(fftwf_complex);
     d_fft_in = (fftwf_complex *)fftwf_malloc(fft_size);
     if (!d_fft_in)
         throw std::runtime_error("ofdmradar_tx: Failed to allocate FFT in buffer!");

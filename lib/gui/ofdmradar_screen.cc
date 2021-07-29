@@ -15,8 +15,8 @@
 OFDMRadarScreen::OFDMRadarScreen(ofdmradar_params::sptr ofdm_params, QWidget *parent)
     : QOpenGLWidget(parent),
       d_ofdm_params(ofdm_params),
-      d_front_buffer(ofdm_params->carriers() * ofdm_params->symbols()),
-      d_back_buffer(ofdm_params->carriers() * ofdm_params->symbols())
+      d_front_buffer(ofdm_params->peri_length()),
+      d_back_buffer(ofdm_params->peri_length())
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setAutoFillBackground(false);
@@ -82,10 +82,17 @@ void OFDMRadarScreen::initializeGL()
 
     d_texture = new QOpenGLTexture(QOpenGLTexture::Target2D);
     d_texture->setFormat(QOpenGLTexture::RG32F);
-    d_texture->setSize(d_ofdm_params->carriers(), d_ofdm_params->symbols());
+    d_texture->setSize(d_ofdm_params->peri_carriers(), d_ofdm_params->peri_symbols());
     d_texture->allocateStorage(QOpenGLTexture::RG, QOpenGLTexture::Float32);
-    d_texture->setData(0, 0, 0, d_ofdm_params->carriers(), d_ofdm_params->symbols(),
-            1, QOpenGLTexture::RG, QOpenGLTexture::Float32, d_front_buffer.data());
+    d_texture->setData(0,
+                       0,
+                       0,
+                       d_ofdm_params->peri_carriers(),
+                       d_ofdm_params->peri_symbols(),
+                       1,
+                       QOpenGLTexture::RG,
+                       QOpenGLTexture::Float32,
+                       d_front_buffer.data());
     d_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapNearest);
     d_texture->setMagnificationFilter(QOpenGLTexture::Nearest);
 
@@ -95,6 +102,7 @@ void OFDMRadarScreen::initializeGL()
     d_program->setUniformValue("minV", d_min);
     d_program->setUniformValue("maxV", d_max);
     d_program->setUniformValue("rangeV", d_range);
+    d_program->setUniformValue("dopplerRangeV", d_doppler_range);
     d_program->setUniformValue("screenData", 0); // Texture unit 0
     d_program->release();
 }
@@ -120,8 +128,15 @@ void OFDMRadarScreen::paintGL()
     }
 
     if (updated) {
-        d_texture->setData(0, 0, 0, d_ofdm_params->carriers(), d_ofdm_params->symbols(),
-                1, QOpenGLTexture::RG, QOpenGLTexture::Float32, d_front_buffer.data());
+        d_texture->setData(0,
+                           0,
+                           0,
+                           d_ofdm_params->peri_carriers(),
+                           d_ofdm_params->peri_symbols(),
+                           1,
+                           QOpenGLTexture::RG,
+                           QOpenGLTexture::Float32,
+                           d_front_buffer.data());
     }
 
     glClear(GL_COLOR_BUFFER_BIT);
@@ -133,6 +148,7 @@ void OFDMRadarScreen::paintGL()
     d_program->setUniformValue("minV", d_min);
     d_program->setUniformValue("maxV", d_max);
     d_program->setUniformValue("rangeV", d_range);
+    d_program->setUniformValue("dopplerRangeV", d_doppler_range);
 
     glRectf(-1.0f, -1.0f, 1.0f, 1.0f);
 
@@ -140,7 +156,10 @@ void OFDMRadarScreen::paintGL()
     d_program->release();
 }
 
-void OFDMRadarScreen::updateSettings(float min, float max, float range)
+void OFDMRadarScreen::updateSettings(float min,
+                                     float max,
+                                     float range,
+                                     float dopplerRange)
 {
     d_min = min;
     if (d_max < d_min)
@@ -149,6 +168,8 @@ void OFDMRadarScreen::updateSettings(float min, float max, float range)
         d_max = max;
 
     d_range = range;
+
+    d_doppler_range = dopplerRange;
 
     update();
 }
@@ -161,7 +182,7 @@ void OFDMRadarScreen::submitBuffer(const std::complex<float> *data, size_t len)
         const std::lock_guard<std::mutex> lock(d_buffer_mutex);
         if (len != d_back_buffer.size())
             throw std::runtime_error(
-                "ofdmradar_screen::submitBuffer: Errr, length missmatch in?!");
+                "ofdmradar_screen::submitBuffer: Errr, length missmatch?!");
 
         std::memcpy(d_back_buffer.data(), data, sizeof(d_back_buffer[0]) * len);
         d_new_data = true;

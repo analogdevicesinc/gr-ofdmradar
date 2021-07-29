@@ -49,6 +49,7 @@ private:
     float d_min = 0;
     float d_max = 1;
     float d_range = 1;
+    float d_doppler_range = 1;
 
     void cleanupGL();
 
@@ -62,7 +63,7 @@ public:
     QSize sizeHint() const override;
 
 public slots:
-    void updateSettings(float min, float max, float range);
+    void updateSettings(float min, float max, float range, float doppler_range);
 
 protected:
     void resizeGL(int w, int h) override;

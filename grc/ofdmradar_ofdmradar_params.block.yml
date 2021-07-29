@@ -12,6 +12,14 @@ parameters:
   label: Symbols (M)
   dtype: int
   default: 64
+- id: peri_carriers
+  label: Periodogram Carriers
+  dtype: int
+  default: 1024
+- id: peri_symbols
+  label: Periodogram Smybols
+  dtype: int
+  default: 64
 - id: cyclic_prefix_length
   label: Cyclic Prefix Length
   dtype: int
@@ -24,6 +32,17 @@ parameters:
   label: Nyquist Guard
   dtype: int
   default: 64
+- id: wintype
+  label: Window Type
+  dtype: enum
+  default: window.WIN_BLACKMAN_hARRIS
+  options: [BLACKMAN_hARRIS, HAMMING, HANN, BLACKMAN, RECTANGULAR, KAISER, FLATTOP]
+  option_attributes:
+    val: [window.WIN_BLACKMAN_hARRIS, window.WIN_HAMMING, window.WIN_HANN, window.WIN_BLACKMAN,
+      window.WIN_RECTANGULAR, window.WIN_KAISER, window.WIN_FLATTOP]
+  option_labels: [Blackman-harris, Hamming, Hann, Blackman, Rectangular, Kaiser, Flat-top]
+  hide: part
+
 - id: modulation_scheme
   label: Modulation Scheme
   dtype: enum
@@ -48,17 +67,19 @@ parameters:
   dtype: int
   default: 0
 
-# value: ${( str({"carriers": carriers, "symbols": symbols, "prefix": cyclic_prefix_length, "dc_guard": dc_guard, "nyquist_guard": nyquist_guard, "constellation": modulation_scheme, "seed": seed}) )}
-value: ${( ofdmradar.ofdmradar_params(carriers, symbols, cyclic_prefix_length, dc_guard, nyquist_guard, [-1, 1], seed) )}
+value: ${( ofdmradar.ofdmradar_params(carriers, symbols, peri_carriers, peri_symbols, cyclic_prefix_length, dc_guard, nyquist_guard, window.WIN_BLACKMAN, [], seed) )}
 
 templates:
   imports: import ofdmradar
   var_make: |-
     self.${id} = ${id} = ofdmradar.ofdmradar_params(${carriers},
       ${symbols},
+      ${peri_carriers},
+      ${peri_symbols},
       ${cyclic_prefix_length},
       ${dc_guard},
       ${nyquist_guard},
+      ${wintype.val},
       % if str(modulation_scheme) == "Custom":
       ${custom_constellation}
       % else:

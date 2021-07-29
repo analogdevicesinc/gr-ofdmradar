@@ -29,8 +29,11 @@ private:
     std::vector<gr_complex> d_frame_buffer;
     std::vector<tag_t> d_tags;
     fftwf_plan d_doppler_fft_plan;
+    fftwf_plan d_peri_c_ifft_plan;
     size_t d_buffer_size;
     size_t d_total_consumed = 0;
+    std::vector<float> d_window_carriers;
+    std::vector<float> d_window_symbols;
 
 public:
     ofdmradar_rx_impl(ofdmradar_params::sptr ofdm_params,

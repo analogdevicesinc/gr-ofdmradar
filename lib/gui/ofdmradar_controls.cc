@@ -32,6 +32,20 @@ OFDMRadarControls::OFDMRadarControls(QWidget *parent) : QFormLayout(parent)
     connect(
         d_range_slider, &QSlider::valueChanged, this, &OFDMRadarControls::slidersChanged);
 
+    QLabel *doppler_range_label = new QLabel();
+    doppler_range_label->setText(tr("Doppler Range: "));
+    doppler_range_label->setAlignment(Qt::AlignLeft);
+    QSlider *doppler_range_slider = new QSlider(Qt::Horizontal);
+    doppler_range_slider->setMinimum(10);
+    doppler_range_slider->setMaximum(1000);
+    doppler_range_slider->setTickInterval(100);
+    doppler_range_slider->setTickPosition(QSlider::TicksBelow);
+    doppler_range_slider->setValue(1000);
+    d_doppler_range_slider = doppler_range_slider;
+    this->addRow(doppler_range_label, doppler_range_slider);
+    connect(
+        d_doppler_range_slider, &QSlider::valueChanged, this, &OFDMRadarControls::slidersChanged);
+
     QLabel *min_label = new QLabel();
     min_label->setText(tr("Min: "));
     min_label->setAlignment(Qt::AlignLeft);
@@ -67,5 +81,6 @@ void OFDMRadarControls::emitSettingsSignal()
 {
     emit settingsChanged(d_min_slider->value() / 10.f,
                          d_max_slider->value() / 10.f,
-                         d_range_slider->value() / 1000.f);
+                         d_range_slider->value() / 1000.f,
+                         d_doppler_range_slider->value() / 1000.0f);
 }

@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(ofdmradar.h)                                               */
-/* BINDTOOL_HEADER_FILE_HASH(6591ae7b40897f2e0bf1fae890d77b91)                     */
+/* BINDTOOL_HEADER_FILE_HASH(2e6f2717512017662b3aacd5c251df06)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -36,9 +36,12 @@ void bind_ofdmradar(py::module &m)
         .def(py::init(&ofdmradar_params::make),
              py::arg("carriers"),
              py::arg("symbols"),
+             py::arg("peri_carriers"),
+             py::arg("peri_symbols"),
              py::arg("cyclic_prefix_length"),
              py::arg("dc_guard"),
              py::arg("nyquist_guard"),
+             py::arg("window_type"),
              py::arg("constellation"),
              py::arg("seed"),
              D(ofdmradar_params, make))
@@ -48,14 +51,21 @@ void bind_ofdmradar(py::module &m)
 
         .def_property_readonly("carriers", &ofdmradar_params::carriers)
         .def_property_readonly("symbols", &ofdmradar_params::symbols)
-        .def_property_readonly("cyclic_prefix_length", &ofdmradar_params::cyclic_prefix_length)
+        .def_property_readonly("peri_carriers", &ofdmradar_params::peri_carriers)
+        .def_property_readonly("peri_symbols", &ofdmradar_params::peri_symbols)
+        .def_property_readonly("peri_length", &ofdmradar_params::peri_length)
+        .def_property_readonly("cyclic_prefix_length",
+                               &ofdmradar_params::cyclic_prefix_length)
         .def_property_readonly("dc_guard", &ofdmradar_params::dc_guard)
         .def_property_readonly("nyquist_guard", &ofdmradar_params::nyquist_guard)
+        .def_property_readonly("window_type", &ofdmradar_params::window_type)
         .def_property_readonly("constellation", &ofdmradar_params::constellation)
         .def_property_readonly("seed", &ofdmradar_params::seed)
         .def_property_readonly("symbol_length", &ofdmradar_params::symbol_length)
         .def_property_readonly("frame_length", &ofdmradar_params::frame_length)
-        .def_property_readonly("carrier_mask", &ofdmradar_params::carrier_mask);
+        .def_property_readonly("carrier_mask", &ofdmradar_params::carrier_mask)
+
+        .def("window", &ofdmradar_params::window, py::arg("ntaps"));
 
     using modulation_scheme = gr::ofdmradar::modulation_scheme;
     py::enum_<modulation_scheme>(m, "modulation_scheme", D(modulation_scheme))

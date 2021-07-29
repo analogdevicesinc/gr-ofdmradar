@@ -20,6 +20,7 @@ class OFDMRadarControls : public QFormLayout
 private:
     QWidget *d_range_label;
     QSlider *d_range_slider;
+    QSlider *d_doppler_range_slider;
     QSlider *d_min_slider;
     QSlider *d_max_slider;
 
@@ -31,7 +32,7 @@ private slots:
     void slidersChanged(int v);
 
 signals:
-    void settingsChanged(float min, float max, float range);
+    void settingsChanged(float min, float max, float range, float doppler_range);
 };
 
 #endif // H_OFDMRADAR_GUI_OFDMRADAR_CONTROLS
