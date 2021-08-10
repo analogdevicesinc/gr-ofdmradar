@@ -74,9 +74,10 @@ your channel.
 
 The cyclic prefix length needs to be `> D_S * f_s`.
 
-##### Symbols ('M')
+##### Symbols (`M`)
 
-How many OFDM symbols make up an OFDM frame. This determines the available doppler resolution.
+How many OFDM symbols make up an OFDM frame. This determines the available doppler resolution ` =
+f_s / (N + CP) / M`
 
 ##### Periodogram Carriers / Symbols
 
@@ -146,6 +147,8 @@ relationship. The exact timing can be calibrated out later on, as long as it sta
 
 Now the processed receive matrix is just rendered to screen, with some post processing applied, like
 converting our complex values to energy (|x|^2), color grading, etc.
+
+Everything mentioned up until now can be found in much greater detail in [0].
 
 ## Implementation and integration
 
