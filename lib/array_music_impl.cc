@@ -15,6 +15,8 @@
 #include <cmath>
 #include <vector>
 
+using namespace std::complex_literals;
+
 namespace gr {
 namespace ofdmradar {
 
@@ -31,8 +33,17 @@ array_music_impl::array_music_impl(int array_size, int output_resolution, int ta
           gr::io_signature::make(1, 1, output_resolution * sizeof(float))),
       d_array_size(array_size),
       d_output_resolution(output_resolution),
-      d_targets(targets)
+      d_targets(targets),
+      d_steering_vectors(array_size, output_resolution)
 {
+    const float half = output_resolution/2.0f;
+
+    for (int u = 0; u < output_resolution; u++) {
+        float phi = (u-half) / output_resolution * M_PIf32;
+        float omega = std::sin(phi) * M_PIf32;
+        for (int v = 0; v < array_size; v++)
+            d_steering_vectors(v, u) = std::exp(static_cast<gr_complex>(1.0fi * omega * v));
+    }
 }
 
 array_music_impl::~array_music_impl() {}
@@ -43,8 +54,6 @@ int array_music_impl::work(int noutput_items,
 {
     const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[0]);
     float *out = reinterpret_cast<float *>(output_items[0]);
-
-    std::cout << "music: noutput_items: " << noutput_items << std::endl;
 
     using Eigen::ArrayXf;
     using Eigen::Dynamic;
@@ -81,13 +90,28 @@ int array_music_impl::work(int noutput_items,
         return a.v > b.v;
     });
 
-    for (int i = 0; i < d_array_size; i++)
-        std::cout << "v: " << sorted_vecs[i].v << ", idx: " << sorted_vecs[i].idx
-                  << std::endl;
+    const int noise_dim = d_array_size - d_targets;
+    MatrixXcf noise_space(d_array_size, noise_dim);
+
+    for (int i = 0; i < noise_dim; i++)
+        noise_space.col(i).noalias() = eigvecs.col(sorted_vecs[d_targets+i].idx);
 
     Map<VectorXf> ovec(out, d_output_resolution);
-    consume_each(1);
-    std::cout << "Done!" << std::endl;
+
+    for (int i = 0; i < d_output_resolution; i++) {
+        const auto v = (d_steering_vectors.col(i).transpose().conjugate() *
+                      noise_space * noise_space.transpose().conjugate() *
+                      d_steering_vectors.col(i))(0,0);
+        ovec(i) = 1/std::abs(v);
+    }
+
+    auto max = ovec.maxCoeff();
+    if (max != 0)
+        ovec /= max;
+
+    // std::cout << "ovec:" << std::endl;
+    // std::cout << ovec << std::endl;
+
     return 1;
 }
 

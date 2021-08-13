@@ -54,25 +54,19 @@ int array_corr_impl::general_work(int noutput_items,
     if (ninput_items[0] < d_samples)
         return 0;
 
-    std::cout << "corr: d_samples: " << d_samples << ", ninput_items[0]: " << ninput_items[0] << std::endl;
-
     int ret;
     for (ret = 0; (ret + 1) * d_samples <= ninput_items[0] && ret < noutput_items; ret++) {
         Map<const MatrixXcf> inmat(in, d_array_size, d_samples);
 
         Map<MatrixXcf> outmat(out, d_array_size, d_array_size);
 
-        outmat = inmat * inmat.conjugate().transpose() / d_samples;
-        std::cout << "outmat:" << std::endl;
-        std::cout << outmat << std::endl;
+        outmat.noalias() = inmat * inmat.conjugate().transpose() / d_samples;
 
         in += d_samples * d_array_size;
         out += d_array_size * d_array_size;
     }
 
     consume_each(ret * d_samples);
-    std::cout << "ret: " << ret << std::endl;
-    // Tell runtime system how many output items we produced.
     return ret;
 }
 

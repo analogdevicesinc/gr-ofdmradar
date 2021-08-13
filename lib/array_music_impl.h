@@ -10,6 +10,8 @@
 
 #include <ofdmradar/array_music.h>
 
+#include <Eigen/Dense>
+
 namespace gr {
 namespace ofdmradar {
 
@@ -19,6 +21,7 @@ private:
     int d_array_size;
     int d_output_resolution;
     int d_targets;
+    Eigen::MatrixXcf d_steering_vectors;
 
 public:
     array_music_impl(int array_size, int output_resolution, int targets);

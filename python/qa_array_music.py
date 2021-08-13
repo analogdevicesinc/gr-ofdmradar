@@ -32,14 +32,16 @@ class qa_array_music(gr_unittest.TestCase):
         N = 1024
         output_resolution = 1024
         s = np.ones((elements, N)) # np.exp(1j * 0.1 * 2*np.pi * np.arange(elements))
-        N_0 = 1
+        SNR_dB = 15
+        SNR = 10 ** (SNR_dB/10)
+        N_0 = 1/SNR
         sigma = np.sqrt(N_0/2)
         n = sigma * (np.random.randn(elements, N) + 1j * np.random.randn(elements, N))
         x = n + s
         omega = 0.1
         steer = np.ones(elements) # np.exp(1j * 2*np.pi * omega * np.arange(elements))
-        x = (x * steer[:,np.newaxis])
-        x = np.repeat(x, 2)
+        x = np.tile((x * steer[:,np.newaxis]), 2)
+        x = np.transpose(x).reshape(np.prod(x.shape))
 
         self.vector_source = blocks.vector_source_c(x, repeat=False, vlen=elements)
         self.corr_instance = array_corr(elements, N)
