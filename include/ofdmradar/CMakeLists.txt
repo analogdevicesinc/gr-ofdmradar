@@ -14,6 +14,8 @@ install(FILES
     ofdmradar.h
     ofdmradar_tx.h
     ofdmradar_rx.h
-    ofdmradar_gui.h DESTINATION include/ofdmradar
+    ofdmradar_gui.h
+    array_corr.h
+    array_music.h DESTINATION include/ofdmradar
 
 )

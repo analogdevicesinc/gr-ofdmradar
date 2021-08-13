@@ -19,6 +19,8 @@ list(APPEND ofdmradar_sources
     gui/ofdmradar_widget.cc
     gui/ofdmradar_screen.cc
     gui/ofdmradar_controls.cc
+    array_corr_impl.cc
+    array_music_impl.cc
 )
 
 qt5_add_resources(ofdmradar_sources resources/resources.qrc)
@@ -35,6 +37,9 @@ target_include_directories(gnuradio-ofdmradar
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
   )
+target_link_libraries(gnuradio-ofdmradar ${ARMADILLO_LIBRARIES})
+target_include_directories(gnuradio-ofdmradar PRIVATE ${ARMADILLO_INCLUDE_DIRS})
+target_link_libraries(gnuradio-ofdmradar Eigen3::Eigen)
 set_target_properties(gnuradio-ofdmradar PROPERTIES DEFINE_SYMBOL "gnuradio_ofdmradar_EXPORTS")
 
 target_compile_definitions(gnuradio-ofdmradar PRIVATE -DQWT_DLL)

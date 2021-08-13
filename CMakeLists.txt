@@ -118,6 +118,8 @@ find_package(Doxygen)
 find_package(FFTW3f REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qwt REQUIRED)
+find_package(Armadillo REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 GR_PYTHON_CHECK_MODULE("PyQt5" PyQt5 True PYQT5_FOUND)
 

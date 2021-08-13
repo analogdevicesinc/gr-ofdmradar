@@ -32,7 +32,9 @@ list(APPEND ofdmradar_python_files
     ofdmradar_python.cc
     ofdmradar_tx_python.cc
     ofdmradar_rx_python.cc
-    ofdmradar_gui_python.cc python_bindings.cc)
+    ofdmradar_gui_python.cc
+    array_corr_python.cc
+    array_music_python.cc python_bindings.cc)
 
 GR_PYBIND_MAKE_OOT(ofdmradar 
    ../..

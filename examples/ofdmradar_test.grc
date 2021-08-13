@@ -27,7 +27,7 @@ options:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 12.0]
+    coordinate: [112, 12.0]
     rotation: 0
     state: enabled
 
@@ -53,7 +53,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [360, 12.0]
+    coordinate: [464, 12.0]
     rotation: 0
     state: true
 - name: samp_rate
@@ -65,7 +65,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [176, 12.0]
+    coordinate: [280, 12.0]
     rotation: 0
     state: enabled
 - name: analog_fastnoise_source_x_0
@@ -85,7 +85,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [792, 396.0]
+    coordinate: [728, 420.0]
     rotation: 0
     state: true
 - name: blocks_add_xx_0
@@ -103,7 +103,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1048, 248.0]
+    coordinate: [976, 312.0]
     rotation: 0
     state: enabled
 - name: blocks_message_debug_0
@@ -119,7 +119,7 @@ blocks:
     bus_structure: null
     coordinate: [232, 592.0]
     rotation: 180
-    state: true
+    state: disabled
 - name: blocks_multiply_const_vxx_0
   id: blocks_multiply_const_vxx
   parameters:
@@ -135,7 +135,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [328, 252.0]
+    coordinate: [264, 276.0]
     rotation: 0
     state: enabled
 - name: blocks_multiply_const_vxx_0_0
@@ -153,7 +153,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [760, 524.0]
+    coordinate: [672, 548.0]
     rotation: 180
     state: enabled
 - name: blocks_probe_rate_0
@@ -174,7 +174,7 @@ blocks:
     bus_structure: null
     coordinate: [488, 580.0]
     rotation: 180
-    state: true
+    state: disabled
 - name: blocks_throttle_0
   id: blocks_throttle
   parameters:
@@ -191,7 +191,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [496, 252.0]
+    coordinate: [432, 276.0]
     rotation: 0
     state: enabled
 - name: freq_xlating_fir_filter_xxx_0
@@ -211,7 +211,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 180.0]
+    coordinate: [688, 204.0]
     rotation: 0
     state: enabled
 - name: freq_xlating_fir_filter_xxx_0_0
@@ -231,7 +231,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 292.0]
+    coordinate: [688, 316.0]
     rotation: 0
     state: enabled
 - name: import_0
@@ -244,7 +244,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [280, 12.0]
+    coordinate: [384, 12.0]
     rotation: 0
     state: true
 - name: ofdmradar_ofdmradar_gui_0
@@ -259,7 +259,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [464, 524.0]
+    coordinate: [376, 548.0]
     rotation: 180
     state: true
 - name: ofdmradar_ofdmradar_rx_0
@@ -277,7 +277,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [928, 508.0]
+    coordinate: [840, 532.0]
     rotation: 180
     state: enabled
 - name: ofdmradar_ofdmradar_tx_0
@@ -294,7 +294,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [80, 244.0]
+    coordinate: [16, 268.0]
     rotation: 0
     state: enabled
 - name: qtgui_freq_sink_x_0
@@ -377,7 +377,7 @@ blocks:
     bus_structure: null
     coordinate: [1192, 180.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: qtgui_freq_sink_x_0_0
   id: qtgui_freq_sink_x
   parameters:
