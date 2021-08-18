@@ -64,40 +64,11 @@ int array_music_impl::work(int noutput_items,
     using Eigen::VectorXcf;
     using Eigen::VectorXf;
 
-    struct tuple {
-        float v;
-        int idx;
-    };
-
     for (int s = 0; s < noutput_items; s++) {
-
         Map<const MatrixXcf> imat(in, d_array_size, d_array_size);
 
-        VectorXcf eigvals(d_array_size);
-        MatrixXcf eigvecs(d_array_size, d_array_size);
-        Eigen::SelfAdjointEigenSolver<MatrixXcf> eigensolver(imat);
-
-        eigvals = eigensolver.eigenvalues();
-        eigvecs = eigensolver.eigenvectors();
-
-        ArrayXf absolutes(d_array_size);
-        absolutes = eigvals.array().abs();
-
-        std::vector<tuple> sorted_vecs(d_array_size);
-        for (int i = 0; i < d_array_size; i++) {
-            sorted_vecs[i].v = absolutes(i);
-            sorted_vecs[i].idx = i;
-        }
-
-        std::sort(sorted_vecs.begin(), sorted_vecs.end(), [](tuple &a, tuple &b) {
-            return a.v > b.v;
-        });
-
         const int noise_dim = d_array_size - d_targets;
-        MatrixXcf noise_space(d_array_size, noise_dim);
-
-        for (int i = 0; i < noise_dim; i++)
-            noise_space.col(i).noalias() = eigvecs.col(sorted_vecs[d_targets + i].idx);
+        auto&& noise_space = imat.leftCols(noise_dim);
 
         Map<VectorXf> ovec(out, d_output_resolution);
 

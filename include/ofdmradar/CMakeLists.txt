@@ -16,6 +16,7 @@ install(FILES
     ofdmradar_rx.h
     ofdmradar_gui.h
     array_corr.h
-    array_music.h DESTINATION include/ofdmradar
+    array_music.h
+    array_esprit.h DESTINATION include/ofdmradar
 
 )

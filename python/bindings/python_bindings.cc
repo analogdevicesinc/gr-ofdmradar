@@ -27,6 +27,7 @@ namespace py = pybind11;
     void bind_ofdmradar_gui(py::module& m);
     void bind_array_corr(py::module& m);
     void bind_array_music(py::module& m);
+    void bind_array_esprit(py::module& m);
 // ) END BINDING_FUNCTION_PROTOTYPES
 
 
@@ -61,5 +62,6 @@ PYBIND11_MODULE(ofdmradar_python, m)
     bind_ofdmradar_gui(m);
     bind_array_corr(m);
     bind_array_music(m);
+    bind_array_esprit(m);
     // ) END BINDING_FUNCTION_CALLS
 }

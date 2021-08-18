@@ -21,6 +21,7 @@ list(APPEND ofdmradar_sources
     gui/ofdmradar_controls.cc
     array_corr_impl.cc
     array_music_impl.cc
+    array_esprit_impl.cc
 )
 
 qt5_add_resources(ofdmradar_sources resources/resources.qrc)

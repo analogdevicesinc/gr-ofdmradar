@@ -58,9 +58,14 @@ int array_corr_impl::general_work(int noutput_items,
     for (ret = 0; (ret + 1) * d_samples <= ninput_items[0] && ret < noutput_items; ret++) {
         Map<const MatrixXcf> inmat(in, d_array_size, d_samples);
 
-        Map<MatrixXcf> outmat(out, d_array_size, d_array_size);
+        MatrixXcf R_xx(d_array_size, d_array_size);
+        R_xx = inmat * inmat.conjugate().transpose() / d_samples;
 
-        outmat.noalias() = inmat * inmat.conjugate().transpose() / d_samples;
+        MatrixXcf eigvecs(d_array_size, d_array_size);
+        Eigen::SelfAdjointEigenSolver<MatrixXcf> eigensolver(R_xx);
+
+        Map<MatrixXcf> outmat(out, d_array_size, d_array_size);
+        outmat = eigensolver.eigenvectors();
 
         in += d_samples * d_array_size;
         out += d_array_size * d_array_size;
