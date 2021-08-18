@@ -15,7 +15,8 @@ namespace gr {
 namespace ofdmradar {
 
 /*!
- * \brief <+description of block+>
+ * \brief This block performs the correlation between the different input streams and
+ *        returns the correlation matrix which is used by MUSIC.
  * \ingroup ofdmradar
  *
  */
@@ -31,6 +32,10 @@ public:
      * constructor is in a private implementation
      * class. ofdmradar::array_corr::make is the public interface for
      * creating new instances.
+     *
+     * \param array_size The amount of elements in the linear array. Determines the width
+     *                   of the input vector.
+     * \param samples    How many samples should be considered for each correlation.
      */
     static sptr make(int array_size, int samples);
 };

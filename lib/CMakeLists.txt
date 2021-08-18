@@ -31,6 +31,7 @@ if(NOT ofdmradar_sources)
     return()
 endif(NOT ofdmradar_sources)
 
+add_compile_options(-fno-omit-frame-pointer)
 add_library(gnuradio-ofdmradar SHARED ${ofdmradar_sources})
 target_link_libraries(gnuradio-ofdmradar gnuradio::gnuradio-runtime gnuradio::gnuradio-blocks gnuradio::gnuradio-fft gnuradio::gnuradio-filter gnuradio::gnuradio-qtgui fftw3f::fftw3f qwt::qwt Qt5::Widgets)
 target_include_directories(gnuradio-ofdmradar

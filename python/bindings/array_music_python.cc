@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(array_music.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(842d2aa4fb3dd3d40e6f7fed1cb4f741)                     */
+/* BINDTOOL_HEADER_FILE_HASH(0e5b664f55b2a23bf200ff835ca0106a)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>

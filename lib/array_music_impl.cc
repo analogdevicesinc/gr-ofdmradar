@@ -36,13 +36,14 @@ array_music_impl::array_music_impl(int array_size, int output_resolution, int ta
       d_targets(targets),
       d_steering_vectors(array_size, output_resolution)
 {
-    const float half = output_resolution/2.0f;
+    const float half = output_resolution / 2.0f;
 
     for (int u = 0; u < output_resolution; u++) {
-        float phi = (u-half) / output_resolution * M_PIf32;
+        float phi = (u - half) / output_resolution * M_PIf32;
         float omega = std::sin(phi) * M_PIf32;
         for (int v = 0; v < array_size; v++)
-            d_steering_vectors(v, u) = std::exp(static_cast<gr_complex>(1.0fi * omega * v));
+            d_steering_vectors(v, u) =
+                std::exp(static_cast<gr_complex>(1.0fi * omega * v));
     }
 }
 
@@ -63,56 +64,61 @@ int array_music_impl::work(int noutput_items,
     using Eigen::VectorXcf;
     using Eigen::VectorXf;
 
-    Map<const MatrixXcf> imat(in, d_array_size, d_array_size);
-
-    VectorXcf eigvals(d_array_size);
-    MatrixXcf eigvecs(d_array_size, d_array_size);
-    Eigen::SelfAdjointEigenSolver<MatrixXcf> eigensolver(imat);
-
-    eigvals = eigensolver.eigenvalues();
-    eigvecs = eigensolver.eigenvectors();
-
-    ArrayXf absolutes(d_array_size);
-    absolutes = eigvals.array().abs();
-
     struct tuple {
         float v;
         int idx;
     };
 
-    std::vector<tuple> sorted_vecs(d_array_size);
-    for (int i = 0; i < d_array_size; i++) {
-        sorted_vecs[i].v = absolutes(i);
-        sorted_vecs[i].idx = i;
+    for (int s = 0; s < noutput_items; s++) {
+
+        Map<const MatrixXcf> imat(in, d_array_size, d_array_size);
+
+        VectorXcf eigvals(d_array_size);
+        MatrixXcf eigvecs(d_array_size, d_array_size);
+        Eigen::SelfAdjointEigenSolver<MatrixXcf> eigensolver(imat);
+
+        eigvals = eigensolver.eigenvalues();
+        eigvecs = eigensolver.eigenvectors();
+
+        ArrayXf absolutes(d_array_size);
+        absolutes = eigvals.array().abs();
+
+        std::vector<tuple> sorted_vecs(d_array_size);
+        for (int i = 0; i < d_array_size; i++) {
+            sorted_vecs[i].v = absolutes(i);
+            sorted_vecs[i].idx = i;
+        }
+
+        std::sort(sorted_vecs.begin(), sorted_vecs.end(), [](tuple &a, tuple &b) {
+            return a.v > b.v;
+        });
+
+        const int noise_dim = d_array_size - d_targets;
+        MatrixXcf noise_space(d_array_size, noise_dim);
+
+        for (int i = 0; i < noise_dim; i++)
+            noise_space.col(i).noalias() = eigvecs.col(sorted_vecs[d_targets + i].idx);
+
+        Map<VectorXf> ovec(out, d_output_resolution);
+
+        MatrixXcf noise_tmp(d_array_size, d_array_size);
+        noise_tmp = noise_space * noise_space.transpose().conjugate();
+
+        for (int i = 0; i < d_output_resolution; i++) {
+            const auto v = (d_steering_vectors.col(i).transpose().conjugate() *
+                            noise_tmp * d_steering_vectors.col(i))(0, 0);
+            ovec(i) = 1 / std::abs(v);
+        }
+
+        auto max = ovec.maxCoeff();
+        if (max != 0)
+            ovec /= max;
+
+        in += d_array_size * d_array_size;
+        out += d_output_resolution;
     }
 
-    std::sort(sorted_vecs.begin(), sorted_vecs.end(), [](tuple &a, tuple &b) {
-        return a.v > b.v;
-    });
-
-    const int noise_dim = d_array_size - d_targets;
-    MatrixXcf noise_space(d_array_size, noise_dim);
-
-    for (int i = 0; i < noise_dim; i++)
-        noise_space.col(i).noalias() = eigvecs.col(sorted_vecs[d_targets+i].idx);
-
-    Map<VectorXf> ovec(out, d_output_resolution);
-
-    for (int i = 0; i < d_output_resolution; i++) {
-        const auto v = (d_steering_vectors.col(i).transpose().conjugate() *
-                      noise_space * noise_space.transpose().conjugate() *
-                      d_steering_vectors.col(i))(0,0);
-        ovec(i) = 1/std::abs(v);
-    }
-
-    auto max = ovec.maxCoeff();
-    if (max != 0)
-        ovec /= max;
-
-    // std::cout << "ovec:" << std::endl;
-    // std::cout << ovec << std::endl;
-
-    return 1;
+    return noutput_items;
 }
 
 } /* namespace ofdmradar */

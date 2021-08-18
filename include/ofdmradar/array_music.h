@@ -15,7 +15,8 @@ namespace gr {
 namespace ofdmradar {
 
 /*!
- * \brief <+description of block+>
+ * \brief Calculate the MUSIC pseudo spectrum from a correlation matrix as produced by
+ *        array_corr.
  * \ingroup ofdmradar
  *
  */
@@ -31,6 +32,12 @@ public:
      * constructor is in a private implementation
      * class. ofdmradar::array_music::make is the public interface for
      * creating new instances.
+     *
+     * \param array_size The amount of elements in the linear array. Determines the width
+     *                   of the input vector.
+     * \param output_resolution The resolution of the music pseudo spectrum.
+     * \param targets    The size of our signal space or how many sources we want to
+     *                   estimate.
      */
     static sptr make(int array_size, int output_resolution, int targets);
 };

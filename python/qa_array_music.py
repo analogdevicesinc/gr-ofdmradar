@@ -8,7 +8,6 @@
 
 from gnuradio import gr, gr_unittest, blocks
 import numpy as np
-# from gnuradio import blocks
 try:
     from ofdmradar import array_music, array_corr
 except ImportError:
