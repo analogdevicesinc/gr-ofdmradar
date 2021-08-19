@@ -15,7 +15,7 @@ namespace gr {
 namespace ofdmradar {
 
 /*!
- * \brief <+description of block+>
+ * \brief Determines angle of arrival using the ESPRIT method.
  * \ingroup ofdmradar
  *
  */
@@ -31,8 +31,13 @@ public:
      * constructor is in a private implementation
      * class. ofdmradar::array_esprit::make is the public interface for
      * creating new instances.
+     *
+     * \param array_size The amount of elements in the linear array. Determines the width
+     *                   of the input vector.
+     * \param targets    The size of our signal space or how many sources we want to
+     *                   estimate.
      */
-    static sptr make();
+    static sptr make(int array_size, int targets);
 };
 
 } // namespace ofdmradar

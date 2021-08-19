@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(array_esprit.h)                                            */
-/* BINDTOOL_HEADER_FILE_HASH(fb02ce65e02d8c7f9b744d3b4af51fd7)                     */
+/* BINDTOOL_HEADER_FILE(array_calib.h)                                             */
+/* BINDTOOL_HEADER_FILE_HASH(88d6cedbe19862eeac84782ba1f90854)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -23,24 +23,23 @@
 
 namespace py = pybind11;
 
-#include <ofdmradar/array_esprit.h>
+#include <ofdmradar/array_calib.h>
 // pydoc.h is automatically generated in the build directory
-#include <array_esprit_pydoc.h>
+#include <array_calib_pydoc.h>
 
-void bind_array_esprit(py::module &m)
+void bind_array_calib(py::module &m)
 {
+    using array_calib = gr::ofdmradar::array_calib;
 
-    using array_esprit = gr::ofdmradar::array_esprit;
-
-
-    py::class_<array_esprit,
+    py::class_<array_calib,
                gr::sync_block,
                gr::block,
                gr::basic_block,
-               std::shared_ptr<array_esprit>>(m, "array_esprit", D(array_esprit))
+               std::shared_ptr<array_calib>>(m, "array_calib", D(array_calib))
 
-        .def(py::init(&array_esprit::make),
+        .def(py::init(&array_calib::make),
              py::arg("array_size"),
              py::arg("targets"),
-             D(array_esprit, make));
+             py::arg("pilot_angle"),
+             D(array_calib, make));
 }

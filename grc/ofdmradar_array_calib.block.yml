@@ -1,5 +1,5 @@
-id: ofdmradar_array_esprit
-label: Linear Array DOA (ESPRIT)
+id: ofdmradar_array_calib
+label: Linear Array DOA Calib
 category: '[ofdmradar]'
 
 
@@ -12,24 +12,29 @@ parameters:
   label: Target Signal Count
   dtype: int
   default: 1
+- id: pilot_angle
+  label: Pilot Angle
+  dtype: float
+  default: 0
 
 inputs:
 - label: In
   domain: stream
   dtype: complex
-  vlen: ${( array_size * array_size )}
+  vlen: ${( array_size**2 )}
+  optional: false
+- id: trigger
+  domain: message
   optional: false
 
 outputs:
-- label: Phi
-  domain: stream
-  dtype: float
-  vlen: ${( targets )}
+- id: calib
+  domain: message
   optional: false
 
 templates:
   imports: import ofdmradar
-  make: ofdmradar.array_esprit(${array_size}, ${targets})
+  make: ofdmradar.array_calib(${array_size}, ${targets}, ${pilot_angle})
 
 #  'file_format' specifies the version of the GRC yml format used in the file
 #  and should usually not be changed.

@@ -22,6 +22,7 @@ list(APPEND ofdmradar_sources
     array_corr_impl.cc
     array_music_impl.cc
     array_esprit_impl.cc
+    array_calib_impl.cc
 )
 
 qt5_add_resources(ofdmradar_sources resources/resources.qrc)
@@ -83,6 +84,7 @@ include(GrTest)
 #include_directories()
 # List all files that contain Boost.UTF unit tests here
 list(APPEND test_ofdmradar_sources
+qa_array_calib.cc
 )
 # Anything we need to link to for the unit tests go here
 list(APPEND GR_TEST_TARGET_DEPS gnuradio-ofdmradar)

@@ -16,10 +16,11 @@ namespace ofdmradar {
 class array_esprit_impl : public array_esprit
 {
 private:
-    // Nothing to declare in this block.
+    int d_array_size;
+    int d_targets;
 
 public:
-    array_esprit_impl();
+    array_esprit_impl(int array_size, int targets);
     ~array_esprit_impl();
 
     // Where all the action really happens

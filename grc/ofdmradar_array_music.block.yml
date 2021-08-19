@@ -17,7 +17,7 @@ parameters:
   default: 1
 
 inputs:
-- label: R_xx
+- label: In
   domain: stream
   dtype: complex
   vlen: ${( array_size**2 )}

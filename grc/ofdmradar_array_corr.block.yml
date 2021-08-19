@@ -18,6 +18,9 @@ inputs:
   dtype: complex
   vlen: ${( array_size )}
   optional: false
+- id: calib
+  domain: message
+  optional: false
 
 outputs:
 - label: Out

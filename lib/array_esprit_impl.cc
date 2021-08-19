@@ -6,49 +6,84 @@
  */
 
 #include "array_esprit_impl.h"
+
 #include <gnuradio/io_signature.h>
+
+#include <Eigen/Dense>
+
+#include <complex>
+#include <cmath>
 
 namespace gr {
 namespace ofdmradar {
 
-#pragma message("set the following appropriately and remove this warning")
-using input_type = float;
-#pragma message("set the following appropriately and remove this warning")
-using output_type = float;
-array_esprit::sptr array_esprit::make()
+array_esprit::sptr array_esprit::make(int array_size, int targets)
 {
-    return gnuradio::make_block_sptr<array_esprit_impl>();
+    return gnuradio::make_block_sptr<array_esprit_impl>(array_size, targets);
 }
 
-
-/*
- * The private constructor
- */
-array_esprit_impl::array_esprit_impl()
-    : gr::sync_block("array_esprit",
-                     gr::io_signature::make(
-                         1 /* min inputs */, 1 /* max inputs */, sizeof(input_type)),
-                     gr::io_signature::make(
-                         1 /* min outputs */, 1 /*max outputs */, sizeof(output_type)))
+array_esprit_impl::array_esprit_impl(int array_size, int targets)
+    : gr::sync_block(
+          "array_esprit",
+          gr::io_signature::make(1, 1, array_size * array_size * sizeof(gr_complex)),
+          gr::io_signature::make(1, 1, sizeof(float))),
+      d_array_size(array_size),
+      d_targets(targets)
 {
 }
 
-/*
- * Our virtual destructor.
- */
 array_esprit_impl::~array_esprit_impl() {}
+
+namespace {
+
+float angle_from_omega(float omega, float delta_x) {
+    return std::asin(-omega / (2*M_PIf32 * delta_x));
+}
+
+}
 
 int array_esprit_impl::work(int noutput_items,
                             gr_vector_const_void_star &input_items,
                             gr_vector_void_star &output_items)
 {
-    const input_type *in = reinterpret_cast<const input_type *>(input_items[0]);
-    output_type *out = reinterpret_cast<output_type *>(output_items[0]);
+    const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[0]);
+    float *out = reinterpret_cast<float *>(output_items[0]);
 
-#pragma message("Implement the signal processing in your block and remove this warning")
-    // Do <+signal processing+>
+    using Eigen::Map;
+    using Eigen::MatrixXcf;
+    using Eigen::ComplexEigenSolver;
 
-    // Tell runtime system how many output items we produced.
+    for (int i = 0; i < noutput_items; i++) {
+        Map<const MatrixXcf> imat(in, d_array_size, d_array_size); // eigvecs(R_x)
+
+        auto &&U_s = imat.rightCols(d_targets); // Signal space
+
+        MatrixXcf tmp = MatrixXcf::Constant(d_array_size - 1, d_array_size, 0);
+
+        tmp.block(0, 0, d_array_size - 1, d_array_size - 1) =
+            MatrixXcf::Identity(d_array_size - 1, d_array_size - 1);
+
+        MatrixXcf S_1 = tmp * U_s;
+
+        tmp(0, 0) = 0;
+        tmp.block(0, 1, d_array_size - 1, d_array_size - 1) =
+            MatrixXcf::Identity(d_array_size - 1, d_array_size - 1);
+
+        MatrixXcf S_2 = tmp * U_s;
+
+        MatrixXcf Phi = (S_2.adjoint() * S_2).ldlt().solve(S_2.adjoint() * S_1);
+
+        ComplexEigenSolver<MatrixXcf> Phi_eigensolver(Phi, false);
+        auto eigenvals = Phi_eigensolver.eigenvalues();
+
+        for (int i = 0; i < d_targets; i++)
+            out[i] = angle_from_omega(std::arg(eigenvals(0)), 0.5f);
+
+        in += d_array_size * d_array_size;
+        out += d_targets;
+    }
+
+
     return noutput_items;
 }
 

@@ -10,6 +10,10 @@
 
 #include <ofdmradar/array_corr.h>
 
+#include <pmt/pmt.h>
+
+#include <vector>
+
 namespace gr {
 namespace ofdmradar {
 
@@ -18,6 +22,9 @@ class array_corr_impl : public array_corr
 private:
     const int d_samples;
     const int d_array_size;
+    std::vector<gr_complex> d_calib_buffer;
+
+    void handle_calib_data(pmt::pmt_t msg);
 
 public:
     array_corr_impl(int array_size, int samples);

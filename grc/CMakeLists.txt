@@ -13,5 +13,6 @@ install(FILES
     ofdmradar_ofdmradar_gui.block.yml
     ofdmradar_array_corr.block.yml
     ofdmradar_array_music.block.yml
-    ofdmradar_array_esprit.block.yml DESTINATION share/gnuradio/grc/blocks
+    ofdmradar_array_esprit.block.yml
+    ofdmradar_array_calib.block.yml DESTINATION share/gnuradio/grc/blocks
 )
