@@ -28,6 +28,7 @@ private:
     pmt::pmt_t d_trigger_msg_port_id;
     std::vector<gr_complex> d_steering_vector;
     std::atomic<bool> d_calib_requested;
+    std::vector<gr_complex> d_gamma;
 
 public:
     array_calib_impl(int array_size, int targets, float pilot_angle);

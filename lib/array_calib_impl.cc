@@ -44,7 +44,8 @@ array_calib_impl::array_calib_impl(int array_size, int targets, float pilot_angl
       d_steering_vector(array_size),
       d_calib_msg_port_id(pmt::intern("calib")),
       d_trigger_msg_port_id(pmt::intern("trigger")),
-      d_calib_requested(false)
+      d_calib_requested(false),
+      d_gamma(array_size, 1.0f)
 {
     // Generate steering vector a(theta)
     const float omega = omega_from_angle(pilot_angle, 0.5);
@@ -68,6 +69,14 @@ int array_calib_impl::work(int noutput_items,
 {
     const gr_complex *in = reinterpret_cast<const gr_complex *>(input_items[0]);
 
+    /*
+     * Based on
+     * V. C. Soon, L. Tong, Y. F. Huang and R. Liu,
+     * "A Subspace Method for Estimating Sensor Gains and Phases,"
+     * in IEEE Transactions on Signal Processing,
+     * vol. 42, no. 4, pp. 973-976, Apr 1994.
+     */
+
     using Eigen::ComplexEigenSolver;
     using Eigen::Map;
     using Eigen::MatrixXcf;
@@ -89,6 +98,11 @@ int array_calib_impl::work(int noutput_items,
 
     VectorXcf Gamma(d_array_size);
     Gamma = eigensolver.eigenvectors().rightCols(1);
+
+    Map<VectorXcf> old_Gamma(d_gamma.data(), d_array_size);
+    Gamma.array() *= old_Gamma.array();
+
+    old_Gamma = Gamma;
 
     pmt::pmt_t msg =
         pmt::make_blob(Gamma.array().data(), d_array_size * sizeof(gr_complex));
