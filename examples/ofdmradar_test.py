@@ -22,13 +22,12 @@ if __name__ == '__main__':
             print("Warning: failed to XInitThreads()")
 
 from PyQt5 import Qt
-from gnuradio import qtgui
-from gnuradio.filter import firdes
-import sip
 import ofdmradar
+import sip
 from gnuradio import analog
 from gnuradio import blocks
 from gnuradio import filter
+from gnuradio.filter import firdes
 from gnuradio import gr
 from gnuradio.fft import window
 import sys
@@ -93,52 +92,6 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self.qtgui_freq_sink_x_0_0 = qtgui.freq_sink_c(
-            4096, #size
-            window.WIN_BLACKMAN_hARRIS, #wintype
-            0, #fc
-            samp_rate, #bw
-            "", #name
-            1,
-            None # parent
-        )
-        self.qtgui_freq_sink_x_0_0.set_update_time(1/30)
-        self.qtgui_freq_sink_x_0_0.set_y_axis(-140, 10)
-        self.qtgui_freq_sink_x_0_0.set_y_label('Relative Gain', 'dB')
-        self.qtgui_freq_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, 0.0, 0, "")
-        self.qtgui_freq_sink_x_0_0.enable_autoscale(False)
-        self.qtgui_freq_sink_x_0_0.enable_grid(False)
-        self.qtgui_freq_sink_x_0_0.set_fft_average(1.0)
-        self.qtgui_freq_sink_x_0_0.enable_axis_labels(True)
-        self.qtgui_freq_sink_x_0_0.enable_control_panel(False)
-        self.qtgui_freq_sink_x_0_0.set_fft_window_normalized(False)
-
-
-
-        labels = ['', '', '', '', '',
-            '', '', '', '', '']
-        widths = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        colors = ["blue", "red", "green", "black", "cyan",
-            "magenta", "yellow", "dark red", "dark green", "dark blue"]
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0]
-
-        for i in range(1):
-            if len(labels[i]) == 0:
-                self.qtgui_freq_sink_x_0_0.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_freq_sink_x_0_0.set_line_label(i, labels[i])
-            self.qtgui_freq_sink_x_0_0.set_line_width(i, widths[i])
-            self.qtgui_freq_sink_x_0_0.set_line_color(i, colors[i])
-            self.qtgui_freq_sink_x_0_0.set_line_alpha(i, alphas[i])
-
-        self._qtgui_freq_sink_x_0_0_win = sip.wrapinstance(self.qtgui_freq_sink_x_0_0.pyqwidget(), Qt.QWidget)
-        self.top_grid_layout.addWidget(self._qtgui_freq_sink_x_0_0_win, 0, 0, 1, 1)
-        for r in range(0, 1):
-            self.top_grid_layout.setRowStretch(r, 1)
-        for c in range(0, 1):
-            self.top_grid_layout.setColumnStretch(c, 1)
         self.ofdmradar_ofdmradar_tx_0 = ofdmradar.ofdmradar_tx(radar_params, 'packet_len')
         self.ofdmradar_ofdmradar_rx_0 = ofdmradar.ofdmradar_rx(radar_params, 'packet_len', radar_params.frame_length)
         self.ofdmradar_ofdmradar_gui_0 = ofdmradar.ofdmradar_gui(radar_params, None)
@@ -148,7 +101,7 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setRowStretch(r, 1)
         for c in range(1, 2):
             self.top_grid_layout.setColumnStretch(c, 1)
-        self.freq_xlating_fir_filter_xxx_0_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*99 + [0.1] + [0]*10 + [0.4] + [0]*10, -200, samp_rate)
+        self.freq_xlating_fir_filter_xxx_0_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*99 + [0.1] + [0]*10 + [0.4] + [0]*10, 10, samp_rate)
         self.freq_xlating_fir_filter_xxx_0 = filter.freq_xlating_fir_filter_ccc(1, [0]*50 + [0.3] + [0]*30 + [0.1] + [0]*10, 30000, samp_rate)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, 1048576,True)
         self.blocks_multiply_const_vxx_0_0 = blocks.multiply_const_cc(10)
@@ -167,7 +120,6 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_multiply_const_vxx_0_0, 0), (self.ofdmradar_ofdmradar_gui_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.freq_xlating_fir_filter_xxx_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.freq_xlating_fir_filter_xxx_0_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.qtgui_freq_sink_x_0_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0, 0), (self.blocks_add_xx_0, 0))
         self.connect((self.freq_xlating_fir_filter_xxx_0_0, 0), (self.blocks_add_xx_0, 1))
         self.connect((self.ofdmradar_ofdmradar_rx_0, 0), (self.blocks_multiply_const_vxx_0_0, 0))
@@ -187,7 +139,6 @@ class ofdmradar_test(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.qtgui_freq_sink_x_0_0.set_frequency_range(0, self.samp_rate)
 
     def get_radar_params(self):
         return self.radar_params
@@ -206,9 +157,6 @@ def main(top_block_cls=ofdmradar_test, options=None):
     qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls()
-
-    import code
-    code.interact(local=locals())
 
     tb.start()
 

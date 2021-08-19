@@ -33,6 +33,8 @@ import signal
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
+from gnuradio.qtgui import Range, RangeWidget
+from PyQt5 import QtCore
 import doatest_test_waveform_gen as test_waveform_gen  # embedded python module
 import numpy as np
 import ofdmradar
@@ -79,15 +81,18 @@ class doatest(gr.top_block, Qt.QWidget):
         ##################################################
         self.targets = targets = 1
         self.samples = samples = 1024
-        self.samp_rate = samp_rate = 32000
-        self.output_resolution = output_resolution = 1024
+        self.samp_rate = samp_rate = 1000000
+        self.output_resolution = output_resolution = 180
         self.array_size = array_size = 4
-        self.alpha = alpha = 50
+        self.alpha = alpha = 0
         self.SNR = SNR = 0
 
         ##################################################
         # Blocks
         ##################################################
+        self._alpha_range = Range(-90, 90, 1, 0, 200)
+        self._alpha_win = RangeWidget(self._alpha_range, self.set_alpha, 'alpha', "counter_slider", float, QtCore.Qt.Horizontal)
+        self.top_layout.addWidget(self._alpha_win)
         self.qtgui_vector_sink_f_0 = qtgui.vector_sink_f(
             output_resolution,
             -90,
@@ -126,19 +131,69 @@ class doatest(gr.top_block, Qt.QWidget):
 
         self._qtgui_vector_sink_f_0_win = sip.wrapinstance(self.qtgui_vector_sink_f_0.pyqwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_vector_sink_f_0_win)
+        self.qtgui_compass_0 = self._qtgui_compass_0_win = qtgui.GrCompass('', 250, 0.10, False, 1,False,1,"default")
+        self._qtgui_compass_0_win.setColors("default","red", "black", "black")
+        self._qtgui_compass_0 = self._qtgui_compass_0_win
+        self.top_layout.addWidget(self._qtgui_compass_0_win)
         self.ofdmradar_array_music_0 = ofdmradar.array_music(array_size, output_resolution, targets)
+        self.ofdmradar_array_esprit_0 = ofdmradar.array_esprit(array_size, targets)
         self.ofdmradar_array_corr_0 = ofdmradar.array_corr(array_size, samples)
-        self.blocks_vector_source_x_0 = blocks.vector_source_c(test_waveform_gen.get_waveform(array_size, samples * 8, alpha / 180 * np.pi, SNR), True, array_size, [])
-        self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*array_size, samp_rate,True)
+        self.ofdmradar_array_calib_0 = ofdmradar.array_calib(array_size, 1, 0)
+        self.esprit_angle_sink = qtgui.number_sink(
+            gr.sizeof_float,
+            0,
+            qtgui.NUM_GRAPH_HORIZ,
+            1,
+            None # parent
+        )
+        self.esprit_angle_sink.set_update_time(0.10)
+        self.esprit_angle_sink.set_title("ESPRIT Angle")
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        units = ['', '', '', '', '',
+            '', '', '', '', '']
+        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
+            ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
+        factor = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+
+        for i in range(1):
+            self.esprit_angle_sink.set_min(i, -90)
+            self.esprit_angle_sink.set_max(i, 90)
+            self.esprit_angle_sink.set_color(i, colors[i][0], colors[i][1])
+            if len(labels[i]) == 0:
+                self.esprit_angle_sink.set_label(i, "Data {0}".format(i))
+            else:
+                self.esprit_angle_sink.set_label(i, labels[i])
+            self.esprit_angle_sink.set_unit(i, units[i])
+            self.esprit_angle_sink.set_factor(i, factor[i])
+
+        self.esprit_angle_sink.enable_autoscale(False)
+        self._esprit_angle_sink_win = sip.wrapinstance(self.esprit_angle_sink.pyqwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._esprit_angle_sink_win)
+        self.blocks_vector_source_x_0 = blocks.vector_source_c(test_waveform_gen.get_waveform(array_size, samples * 8, alpha / 180 * np.pi, SNR, calib=False), True, array_size, [])
+        self.blocks_multiply_const_xx_0 = blocks.multiply_const_ff(180 / np.pi, 1)
+        self.blocks_message_debug_0 = blocks.message_debug(True)
+        self.array_calib_button = _array_calib_button_toggle_button = qtgui.MsgPushButton('Calibrate Array', 'pressed',True,"default","default")
+        self.array_calib_button = _array_calib_button_toggle_button
+
+        self.top_layout.addWidget(_array_calib_button_toggle_button)
 
 
 
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_throttle_0, 0), (self.ofdmradar_array_corr_0, 0))
-        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_throttle_0, 0))
+        self.msg_connect((self.array_calib_button, 'pressed'), (self.ofdmradar_array_calib_0, 'trigger'))
+        self.msg_connect((self.ofdmradar_array_calib_0, 'calib'), (self.ofdmradar_array_corr_0, 'calib'))
+        self.connect((self.blocks_multiply_const_xx_0, 0), (self.esprit_angle_sink, 0))
+        self.connect((self.blocks_multiply_const_xx_0, 0), (self.qtgui_compass_0, 0))
+        self.connect((self.blocks_vector_source_x_0, 0), (self.ofdmradar_array_corr_0, 0))
+        self.connect((self.ofdmradar_array_corr_0, 0), (self.ofdmradar_array_calib_0, 0))
+        self.connect((self.ofdmradar_array_corr_0, 0), (self.ofdmradar_array_esprit_0, 0))
         self.connect((self.ofdmradar_array_corr_0, 0), (self.ofdmradar_array_music_0, 0))
+        self.connect((self.ofdmradar_array_esprit_0, 0), (self.blocks_multiply_const_xx_0, 0))
         self.connect((self.ofdmradar_array_music_0, 0), (self.qtgui_vector_sink_f_0, 0))
 
 
@@ -161,14 +216,13 @@ class doatest(gr.top_block, Qt.QWidget):
 
     def set_samples(self, samples):
         self.samples = samples
-        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR), [])
+        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR, calib=False), [])
 
     def get_samp_rate(self):
         return self.samp_rate
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.blocks_throttle_0.set_sample_rate(self.samp_rate)
 
     def get_output_resolution(self):
         return self.output_resolution
@@ -182,21 +236,21 @@ class doatest(gr.top_block, Qt.QWidget):
 
     def set_array_size(self, array_size):
         self.array_size = array_size
-        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR), [])
+        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR, calib=False), [])
 
     def get_alpha(self):
         return self.alpha
 
     def set_alpha(self, alpha):
         self.alpha = alpha
-        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR), [])
+        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR, calib=False), [])
 
     def get_SNR(self):
         return self.SNR
 
     def set_SNR(self, SNR):
         self.SNR = SNR
-        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR), [])
+        self.blocks_vector_source_x_0.set_data(test_waveform_gen.get_waveform(self.array_size, self.samples * 8, self.alpha / 180 * np.pi, self.SNR, calib=False), [])
 
 
 

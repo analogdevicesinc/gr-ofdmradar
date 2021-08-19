@@ -117,7 +117,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [232, 592.0]
+    coordinate: [144, 624.0]
     rotation: 180
     state: disabled
 - name: blocks_multiply_const_vxx_0
@@ -172,7 +172,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [488, 580.0]
+    coordinate: [400, 612.0]
     rotation: 180
     state: disabled
 - name: blocks_throttle_0
@@ -219,7 +219,7 @@ blocks:
   parameters:
     affinity: ''
     alias: ''
-    center_freq: '-200'
+    center_freq: '10'
     comment: ''
     decim: '1'
     maxoutbuf: '0'
@@ -458,7 +458,7 @@ blocks:
     bus_structure: null
     coordinate: [752, 84.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: qtgui_time_sink_x_0
   id: qtgui_time_sink_x
   parameters:

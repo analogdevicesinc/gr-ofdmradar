@@ -48,12 +48,33 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '50'
+    value: '0'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
     coordinate: [392, 76.0]
+    rotation: 0
+    state: disabled
+- name: alpha
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: ''
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '-90'
+    step: '1'
+    stop: '90'
+    value: '0'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [656, 12.0]
     rotation: 0
     state: true
 - name: array_size
@@ -72,7 +93,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '1024'
+    value: '180'
   states:
     bus_sink: false
     bus_source: false
@@ -84,7 +105,7 @@ blocks:
   id: variable
   parameters:
     comment: ''
-    value: '32000'
+    value: '1000000'
   states:
     bus_sink: false
     bus_source: false
@@ -116,48 +137,77 @@ blocks:
     coordinate: [456, 12.0]
     rotation: 0
     state: true
-- name: blocks_throttle_0
-  id: blocks_throttle
+- name: array_calib_button
+  id: variable_qtgui_msg_push_button
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: Calibrate Array
+    msgName: pressed
+    relBackgroundColor: default
+    relFontColor: default
+    type: bool
+    value: 'True'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [520, 452.0]
+    rotation: 0
+    state: true
+- name: blocks_message_debug_0
+  id: blocks_message_debug
   parameters:
     affinity: ''
     alias: ''
     comment: ''
-    ignoretag: 'True'
+    en_uvec: 'True'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [968, 120.0]
+    rotation: 0
+    state: true
+- name: blocks_multiply_const_xx_0
+  id: blocks_multiply_const_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    const: 180 / np.pi
     maxoutbuf: '0'
     minoutbuf: '0'
-    samples_per_second: samp_rate
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1088, 348.0]
+    rotation: 0
+    state: true
+- name: blocks_probe_rate_0
+  id: blocks_probe_rate
+  parameters:
+    affinity: ''
+    alias: ''
+    alpha: '0.15'
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    mintime: '500.0'
     type: complex
     vlen: array_size
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [344, 268.0]
+    coordinate: [544, 156.0]
     rotation: 0
-    state: true
-- name: blocks_vector_source_x_0
-  id: blocks_vector_source_x
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    repeat: 'True'
-    tags: '[]'
-    type: complex
-    vector: test_waveform_gen.get_waveform(array_size, samples * 8, alpha / 180 *
-      np.pi, SNR)
-    vlen: array_size
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [96, 252.0]
-    rotation: 0
-    state: true
-- name: blocks_vector_to_streams_0
-  id: blocks_vector_to_streams
+    state: disabled
+- name: blocks_streams_to_vector_0
+  id: blocks_streams_to_vector
   parameters:
     affinity: ''
     alias: ''
@@ -171,7 +221,143 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [560, 352.0]
+    coordinate: [328, 472.0]
+    rotation: 0
+    state: disabled
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    repeat: 'True'
+    tags: '[]'
+    type: complex
+    vector: test_waveform_gen.get_waveform(array_size, samples * 8, alpha / 180 *
+      np.pi, SNR, calib=False)
+    vlen: array_size
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [176, 212.0]
+    rotation: 0
+    state: enabled
+- name: esprit_angle_sink
+  id: qtgui_number_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    autoscale: 'False'
+    avg: '0'
+    color1: ("black", "black")
+    color10: ("black", "black")
+    color2: ("black", "black")
+    color3: ("black", "black")
+    color4: ("black", "black")
+    color5: ("black", "black")
+    color6: ("black", "black")
+    color7: ("black", "black")
+    color8: ("black", "black")
+    color9: ("black", "black")
+    comment: ''
+    factor1: '1'
+    factor10: '1'
+    factor2: '1'
+    factor3: '1'
+    factor4: '1'
+    factor5: '1'
+    factor6: '1'
+    factor7: '1'
+    factor8: '1'
+    factor9: '1'
+    graph_type: qtgui.NUM_GRAPH_HORIZ
+    gui_hint: ''
+    label1: ''
+    label10: ''
+    label2: ''
+    label3: ''
+    label4: ''
+    label5: ''
+    label6: ''
+    label7: ''
+    label8: ''
+    label9: ''
+    max: '90'
+    min: '-90'
+    name: '"ESPRIT Angle"'
+    nconnections: '1'
+    type: float
+    unit1: ''
+    unit10: ''
+    unit2: ''
+    unit3: ''
+    unit4: ''
+    unit5: ''
+    unit6: ''
+    unit7: ''
+    unit8: ''
+    unit9: ''
+    update_time: '0.10'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1296, 316.0]
+    rotation: 0
+    state: true
+- name: iio_ad9081_source_0
+  id: iio_ad9081_source
+  parameters:
+    affinity: ''
+    alias: ''
+    buffer_size: '32768'
+    ch0_en: 'True'
+    ch1_en: 'True'
+    ch2_en: 'True'
+    ch3_en: 'True'
+    ch4_en: 'False'
+    ch5_en: 'False'
+    ch6_en: 'False'
+    ch7_en: 'False'
+    channel_freq_0: '0'
+    channel_freq_1: '0'
+    channel_freq_2: '0'
+    channel_freq_3: '0'
+    channel_freq_4: '0'
+    channel_freq_5: '0'
+    channel_freq_6: '0'
+    channel_freq_7: '0'
+    channel_phase_0: '0'
+    channel_phase_1: '0'
+    channel_phase_2: '0'
+    channel_phase_3: '0'
+    channel_phase_4: '0'
+    channel_phase_5: '0'
+    channel_phase_6: '0'
+    channel_phase_7: '0'
+    comment: ''
+    filter_file: ''
+    len_tag_key: ''
+    main_freq_0: -1.6e9
+    main_freq_1: -1.6e9
+    main_freq_2: '1000000000'
+    main_freq_3: '1000000000'
+    main_phase_0: '0'
+    main_phase_1: '0'
+    main_phase_2: '0'
+    main_phase_3: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    nyquist_zone: 'True'
+    uri: ip:192.168.3.1
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 436.0]
     rotation: 0
     state: disabled
 - name: import_0
@@ -184,8 +370,26 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [504, 76.0]
+    coordinate: [528, 76.0]
     rotation: 0
+    state: true
+- name: ofdmradar_array_calib_0
+  id: ofdmradar_array_calib
+  parameters:
+    affinity: ''
+    alias: ''
+    array_size: array_size
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    pilot_angle: '0'
+    targets: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [544, 340.0]
+    rotation: 180
     state: true
 - name: ofdmradar_array_corr_0
   id: ofdmradar_array_corr
@@ -201,9 +405,26 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [560, 268.0]
+    coordinate: [544, 240.0]
     rotation: 0
     state: enabled
+- name: ofdmradar_array_esprit_0
+  id: ofdmradar_array_esprit
+  parameters:
+    affinity: ''
+    alias: ''
+    array_size: array_size
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    targets: targets
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [840, 340.0]
+    rotation: 0
+    state: true
 - name: ofdmradar_array_music_0
   id: ofdmradar_array_music
   parameters:
@@ -219,101 +440,34 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [832, 260.0]
+    coordinate: [840, 236.0]
     rotation: 0
     state: enabled
-- name: qtgui_const_sink_x_0
-  id: qtgui_const_sink_x
+- name: qtgui_compass_0
+  id: qtgui_compass
   parameters:
     affinity: ''
     alias: ''
-    alpha1: '1.0'
-    alpha10: '1.0'
-    alpha2: '1.0'
-    alpha3: '1.0'
-    alpha4: '1.0'
-    alpha5: '1.0'
-    alpha6: '1.0'
-    alpha7: '1.0'
-    alpha8: '1.0'
-    alpha9: '1.0'
-    autoscale: 'False'
-    axislabels: 'True'
-    color1: '"blue"'
-    color10: '"red"'
-    color2: '"red"'
-    color3: '"green"'
-    color4: '"cyan"'
-    color5: '"red"'
-    color6: '"red"'
-    color7: '"red"'
-    color8: '"red"'
-    color9: '"red"'
+    backgroundColor: default
     comment: ''
-    grid: 'False'
+    fullNeedle: '1'
     gui_hint: ''
-    label1: ''
-    label10: ''
-    label2: ''
-    label3: ''
-    label4: ''
-    label5: ''
-    label6: ''
-    label7: ''
-    label8: ''
-    label9: ''
-    legend: 'True'
-    marker1: '0'
-    marker10: '0'
-    marker2: '0'
-    marker3: '0'
-    marker4: '0'
-    marker5: '0'
-    marker6: '0'
-    marker7: '0'
-    marker8: '0'
-    marker9: '0'
-    name: '""'
-    nconnections: '4'
-    size: '1024'
-    style1: '0'
-    style10: '0'
-    style2: '0'
-    style3: '0'
-    style4: '0'
-    style5: '0'
-    style6: '0'
-    style7: '0'
-    style8: '0'
-    style9: '0'
-    tr_chan: '0'
-    tr_level: '0.0'
-    tr_mode: qtgui.TRIG_MODE_FREE
-    tr_slope: qtgui.TRIG_SLOPE_POS
-    tr_tag: '""'
-    type: complex
+    min_size: '250'
+    name: ''
+    needleBodyColor: black
+    needleTipColor: red
+    position: '1'
+    scaleColor: black
+    setDebug: 'False'
     update_time: '0.10'
-    width1: '1'
-    width10: '1'
-    width2: '1'
-    width3: '1'
-    width4: '1'
-    width5: '1'
-    width6: '1'
-    width7: '1'
-    width8: '1'
-    width9: '1'
-    xmax: '2'
-    xmin: '-2'
-    ymax: '2'
-    ymin: '-2'
+    usemsg: 'False'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [768, 352.0]
+    coordinate: [1296, 428.0]
     rotation: 0
-    state: disabled
+    state: true
 - name: qtgui_vector_sink_f_0
   id: qtgui_vector_sink_f
   parameters:
@@ -384,7 +538,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1064, 252.0]
+    coordinate: [1080, 228.0]
     rotation: 0
     state: enabled
 - name: test_waveform_gen
@@ -392,14 +546,16 @@ blocks:
   parameters:
     alias: ''
     comment: ''
-    source_code: "import numpy as np\n\ndef get_waveform(elements, N, alpha, SNR_dB):\n\
-      \    s = np.ones((elements, N)) # np.exp(1j * 0.1 * 2*np.pi * np.arange(elements))\n\
-      \    SNR = 10 ** (SNR_dB/10)\n    N_0 = 1/SNR\n    sigma = np.sqrt(N_0/2)\n\
-      \    n = sigma * (np.random.randn(elements, N) + 1j * np.random.randn(elements,\
-      \ N))\n    x = n + s\n    omega = np.sin(alpha)\n    d = np.arange(elements,\
-      \ dtype=float)/2\n    steer = np.exp(1j * 2*np.pi * omega * d)\n    x = np.tile((x\
-      \ * steer[:,np.newaxis]), 2)\n    x = np.transpose(x).reshape(np.prod(x.shape))\n\
-      \    return x\n"
+    source_code: "import numpy as np\n\nphi = None\n\ndef get_waveform(elements, N,\
+      \ alpha, SNR_dB, calib=True):\n    global phi\n\n    if phi is None:\n     \
+      \   phi = np.exp(1j * 2*np.pi * np.random.randn(elements))\n\n    if calib:\n\
+      \        s = np.ones((elements, N)) # np.exp(1j * 0.1 * 2*np.pi * np.arange(elements))\n\
+      \    else:\n        s = np.ones((elements, N)) * phi[:,np.newaxis]\n\n    SNR\
+      \ = 10 ** (SNR_dB/10)\n    N_0 = 1/SNR\n    sigma = np.sqrt(N_0/2)\n    n =\
+      \ sigma * (np.random.randn(elements, N) + 1j * np.random.randn(elements, N))\n\
+      \n    omega = np.sin(alpha)\n    d = np.arange(elements, dtype=float)/2\n  \
+      \  steer = np.exp(1j * 2*np.pi * omega * d)\n\n    x = np.tile((s * steer[:,np.newaxis])\
+      \ + n, 2)\n    return np.transpose(x).reshape(np.prod(x.shape))\n\n"
   states:
     bus_sink: false
     bus_source: false
@@ -409,14 +565,22 @@ blocks:
     state: true
 
 connections:
-- [blocks_throttle_0, '0', blocks_vector_to_streams_0, '0']
-- [blocks_throttle_0, '0', ofdmradar_array_corr_0, '0']
-- [blocks_vector_source_x_0, '0', blocks_throttle_0, '0']
-- [blocks_vector_to_streams_0, '0', qtgui_const_sink_x_0, '0']
-- [blocks_vector_to_streams_0, '1', qtgui_const_sink_x_0, '1']
-- [blocks_vector_to_streams_0, '2', qtgui_const_sink_x_0, '2']
-- [blocks_vector_to_streams_0, '3', qtgui_const_sink_x_0, '3']
+- [array_calib_button, pressed, ofdmradar_array_calib_0, trigger]
+- [blocks_multiply_const_xx_0, '0', esprit_angle_sink, '0']
+- [blocks_multiply_const_xx_0, '0', qtgui_compass_0, '0']
+- [blocks_probe_rate_0, rate, blocks_message_debug_0, print]
+- [blocks_streams_to_vector_0, '0', ofdmradar_array_corr_0, '0']
+- [blocks_vector_source_x_0, '0', blocks_probe_rate_0, '0']
+- [blocks_vector_source_x_0, '0', ofdmradar_array_corr_0, '0']
+- [iio_ad9081_source_0, '0', blocks_streams_to_vector_0, '0']
+- [iio_ad9081_source_0, '1', blocks_streams_to_vector_0, '1']
+- [iio_ad9081_source_0, '2', blocks_streams_to_vector_0, '2']
+- [iio_ad9081_source_0, '3', blocks_streams_to_vector_0, '3']
+- [ofdmradar_array_calib_0, calib, ofdmradar_array_corr_0, calib]
+- [ofdmradar_array_corr_0, '0', ofdmradar_array_calib_0, '0']
+- [ofdmradar_array_corr_0, '0', ofdmradar_array_esprit_0, '0']
 - [ofdmradar_array_corr_0, '0', ofdmradar_array_music_0, '0']
+- [ofdmradar_array_esprit_0, '0', blocks_multiply_const_xx_0, '0']
 - [ofdmradar_array_music_0, '0', qtgui_vector_sink_f_0, '0']
 
 metadata:
