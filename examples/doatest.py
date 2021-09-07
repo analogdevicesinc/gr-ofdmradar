@@ -7,7 +7,7 @@
 # GNU Radio Python Flow Graph
 # Title: Not titled yet
 # Author: david
-# GNU Radio version: v3.10.0.0git-507-geef856ed
+# GNU Radio version: v3.10.0.0git-508-ga992edbc
 
 from distutils.version import StrictVersion
 
@@ -129,7 +129,7 @@ class doatest(gr.top_block, Qt.QWidget):
             self.qtgui_vector_sink_f_0.set_line_color(i, colors[i])
             self.qtgui_vector_sink_f_0.set_line_alpha(i, alphas[i])
 
-        self._qtgui_vector_sink_f_0_win = sip.wrapinstance(self.qtgui_vector_sink_f_0.pyqwidget(), Qt.QWidget)
+        self._qtgui_vector_sink_f_0_win = sip.wrapinstance(self.qtgui_vector_sink_f_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_vector_sink_f_0_win)
         self.qtgui_compass_0 = self._qtgui_compass_0_win = qtgui.GrCompass('', 250, 0.10, False, 1,False,1,"default")
         self._qtgui_compass_0_win.setColors("default","red", "black", "black")
@@ -170,7 +170,7 @@ class doatest(gr.top_block, Qt.QWidget):
             self.esprit_angle_sink.set_factor(i, factor[i])
 
         self.esprit_angle_sink.enable_autoscale(False)
-        self._esprit_angle_sink_win = sip.wrapinstance(self.esprit_angle_sink.pyqwidget(), Qt.QWidget)
+        self._esprit_angle_sink_win = sip.wrapinstance(self.esprit_angle_sink.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._esprit_angle_sink_win)
         self.blocks_vector_source_x_0 = blocks.vector_source_c(test_waveform_gen.get_waveform(array_size, samples * 8, alpha / 180 * np.pi, SNR, calib=False), True, array_size, [])
         self.blocks_multiply_const_xx_0 = blocks.multiply_const_ff(180 / np.pi, 1)
