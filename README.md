@@ -15,8 +15,7 @@ Output:
 
 ### Dependencies
 
-* An installation of GNURadio (master / possibly 3.10, this module requires some (at the time of
-  writing this) recent patches.
+* An installation of GNURadio 3.10 or later
 * FFTW3
 * OpenGL development headers and runtime
 
